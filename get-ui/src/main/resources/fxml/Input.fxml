@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane fx:id="inputPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1144.0" prefWidth="1436.0" style="-fx-background-color: WhiteSmoke;" stylesheets="@../styles/bootstrap3.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.hawhh.gewiss.get.fx.controller.InputController">
+    <center>
+        <BorderPane>
+            <top>
+                <BorderPane BorderPane.alignment="CENTER">
+                    <left>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Modifiers:" BorderPane.alignment="CENTER">
+                            <font>
+                                <Font size="24.0" />
+                            </font>
+                            <BorderPane.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </BorderPane.margin>
+                        </Text>
+                    </left>
+                    <right>
+                        <HBox BorderPane.alignment="CENTER">
+                            <children>
+                                <Button mnemonicParsing="false" onAction="#loadModifier" text="Load Modifier">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </HBox.margin>
+                                </Button>
+                                <Button mnemonicParsing="false" onAction="#addModifier" text="Add Modifier">
+                                    <HBox.margin>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                            <BorderPane.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </BorderPane.margin>
+                        </HBox>
+                    </right>
+                </BorderPane>
+            </top>
+            <bottom>
+                <VBox alignment="CENTER" prefWidth="1280.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <Button defaultButton="true" mnemonicParsing="false" onAction="#startSimulation" prefWidth="150.0" styleClass="primary" text="Simulate">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                            <font>
+                                <Font name="System Bold" size="22.0" />
+                            </font>
+                        </Button>
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </padding>
+                    <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </BorderPane.margin>
+                </VBox>
+            </bottom>
+            <center>
+                <TabPane fx:id="modifierTabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1380.0" BorderPane.alignment="CENTER">
+                    <tabs>
+                        <Tab onClosed="#closedFirstModifierPanel" text="Modifier-1">
+                            <content>
+                                <VBox alignment="CENTER" style="-fx-background-color: WhiteSmoke;">
+                                    <children>
+                                        <fx:include fx:id="firstModifier" source="Modifier.fxml" />
+                                    </children>
+                                </VBox>
+                            </content>
+                        </Tab>
+                    </tabs>
+                    <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                    </BorderPane.margin>
+                </TabPane>
+            </center>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </BorderPane>
+    </center>
+    <top>
+        <fx:include fx:id="initialParameters" source="InitialParameters.fxml" BorderPane.alignment="CENTER" />
+    </top>
+</BorderPane>
