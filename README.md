@@ -19,7 +19,7 @@ A more detailed description of the simulation approach can be found in the paper
 ## Git Checkout
 You can checkout the GIT repository either via command line: 
 ```
-git clone https://gitlab.com/gewiss-sim/simbar.git 
+git clone https://github.com/gewiss/gewiss-expert-tool.git
 ```
 Or you can download it from your browser and then unzip it. 
 
