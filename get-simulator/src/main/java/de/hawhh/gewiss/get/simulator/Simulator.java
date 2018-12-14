@@ -14,12 +14,9 @@ import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.EnergySource;
 import de.hawhh.gewiss.get.core.model.EnergySource.Type;
 import de.hawhh.gewiss.get.core.model.HeatingType;
-import de.hawhh.gewiss.get.core.model.RenovationLevel;
 import de.hawhh.gewiss.get.core.output.BuildingInformation;
 import de.hawhh.gewiss.get.core.output.SimulationOutput;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
-import de.hawhh.gewiss.get.simulator.baf.IBuildingAgeFactor;
-import de.hawhh.gewiss.get.simulator.baf.SimpleBuildingAgeFactor;
 import de.hawhh.gewiss.get.simulator.db.dao.BuildingDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.EnergySourceDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.SQLiteBuildingDAO;
@@ -27,6 +24,10 @@ import de.hawhh.gewiss.get.simulator.db.dao.SQLiteEnergySourceDAO;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
 import de.hawhh.gewiss.get.simulator.renovation.IRenovationStrategy;
 import de.hawhh.gewiss.get.simulator.renovation.RenovationHeatExchangeRateStrategy;
+import de.hawhh.gewiss.get.simulator.scoring.BuildingAgeFactor;
+import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionFactor;
+import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionSquareMeterFactor;
+import de.hawhh.gewiss.get.simulator.scoring.ScoringMethod;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,21 +62,18 @@ public class Simulator extends Observable {
     }
 
     /**
-     * Main simulation method. Performs the actual simulation which is carried
-     * out in a discrete manner (one simulation step equals one year). For each
-     * simulation step (year) the renovation score is calculated for each
-     * building. Based on these scores the renovation strategy is applied and
-     * the selected buildings are renovated. Afterwards the current heat demand
-     * of each building is calculated.
+     * Main simulation method. Performs the actual simulation which is carried out in a discrete manner (one simulation step equals one year). For each simulation step
+     * (year) the renovation score is calculated for each building. Based on these scores the renovation strategy is applied and the selected buildings are renovated.
+     * Afterwards the current heat demand of each building is calculated.
      *
      * @param parameter the encapusalted simulation parameters
-     * @param ageFactor the age factor calculation interface/function
+     * @param scoringMethods List of different scoring methods to be applied
      * @param renovationStrategy the selected renovation strategy
      * @param rgSeed seed for the pseudorandom number generator
      * @return
      * @throws de.hawhh.gewiss.get.core.input.InputValidationException
      */
-    public SimulationResult simulate(SimulationParameter parameter, IBuildingAgeFactor ageFactor, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
+    public SimulationResult simulate(SimulationParameter parameter, List<ScoringMethod> scoringMethods, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
         if (rgSeed != null) {
             // set the seed for the random generator
             this.randomGenerator.setSeed(rgSeed);
@@ -89,6 +87,9 @@ public class Simulator extends Observable {
 
         // Fetch the building from the DB
         List<Building> buildings = fetchBuildings();
+        
+        // Limit the number of buildings, only for debug purposes!
+        //buildings = buildings.subList(0, 20);
 
         // Fetch the energy sources from the DB and match them to heating types
         Map<EnergySource.Type, EnergySource> energySources = fetchEnergySources();
@@ -116,14 +117,49 @@ public class Simulator extends Observable {
             // Don't perform a simulation in the first year, here we just calculate the status quo
             if (i > SimulationParameter.FIRST_YEAR) {
                 // Use the stream api to calc the scores in parallel and store the building and scores in a new List
+                LOGGER.info("Calculating initial scoring values");
                 List<ScoredBuilding> scoredBuildings = buildings.stream().parallel().map(building -> {
-                    Double score = calcScore(building, simYear, parameter.getModifiers(), ageFactor);
-                    ScoredBuilding scoredBuilding = new ScoredBuilding(building, score);
+                    ScoredBuilding scoredBuilding = new ScoredBuilding(building);
+
+                    // Calc and store the scores for all scoring methods
+                    scoringMethods.stream().forEach(method -> {
+                        Double score = method.calcBaseScore(building, simYear);
+                        scoredBuilding.getScores().put(method, score);
+                    });
+
                     return scoredBuilding;
                 }).collect(Collectors.toList());
 
+                //LOGGER.info("Scoring Values:");
+                //printScoredBuilding(scoredBuildings);
+
+                // Normalize the scoring values
+                LOGGER.info("Normalizing initial scoring values");
+                normalizeScores(scoredBuildings, scoringMethods);
+                //LOGGER.info("Normalized Scoring Values:");
+                //printScoredBuilding(scoredBuildings);
+
+                // Combine scores
+                LOGGER.info("Combining scoring values");
+                combineScores(scoredBuildings);
+                //LOGGER.info("Combined Normalized Scoring Values");
+                //printScoredBuilding(scoredBuildings);
+
+                // Apply modifiers
+                LOGGER.info("Applying modifiers to scoring values");
+                if (parameter.getModifiers() != null) {
+                    scoredBuildings.parallelStream().forEach(sb -> {
+                        parameter.getModifiers().stream().filter(modifier -> modifier.isActive(simYear) && modifier.checkConditions(sb.getBuilding())).forEach(modifier -> {
+                            sb.setCombinedScore(sb.getCombinedScore() * modifier.getImpactFactor());
+                        });
+                    });
+                }
+                //LOGGER.info("Combined Normalized Scoring Values with Modifiers");
+                //printScoredBuilding(scoredBuildings);
+
                 // Sort the List of scored buildings in a descending (reverse) order of scores
-                Collections.sort(scoredBuildings, (ScoredBuilding o1, ScoredBuilding o2) -> -o1.getScore().compareTo(o2.getScore()));
+                LOGGER.info("Sorting building (desc) according to scoring values");
+                Collections.sort(scoredBuildings, (ScoredBuilding o1, ScoredBuilding o2) -> -o1.getCombinedScore().compareTo(o2.getCombinedScore()));
 
                 // Apply renovation strategy
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
@@ -158,16 +194,16 @@ public class Simulator extends Observable {
             Multimap<Integer, SimulationOutput> mapOutput = ArrayListMultimap.create();
             mapOutput.putAll(simYear, outputs);
             result.getOutput().putAll(mapOutput);
-            
+
             // Notify observers that the simulation of the year is finished
             setChanged();
             notifyObservers(i);
         }
-        
+
         // Map Buildings to BuildingInformation and store them in the result object.
         Map<String, BuildingInformation> resultBuildings = buildings.stream().collect(Collectors.toMap(Building::getAlkisID, building -> BuildingInformation.create(building.getAlkisID(), building.getClusterID(), building.getQuarter(), building.getGeometry())));
         result.setBuildings(resultBuildings);
-        
+
         return result;
     }
 
@@ -231,38 +267,6 @@ public class Simulator extends Observable {
         return heatingTypeToSourceMap;
     }
 
-    /**
-     * Calculate the renovation score for the given building by considering the
-     * given modifiers.
-     *
-     * @param building the given building
-     * @param simYear the current year of the simulation
-     * @param modifiers the List of Modifiers
-     * @param ageFactor interface for the building age factor calculation
-     * @return the calculated score
-     */
-    private Double calcScore(Building building, Integer simYear, List<Modifier> modifiers, IBuildingAgeFactor ageFactor) {
-        // if the building has already reached the maximum renovation level, return a zero score
-        if (building.getRenovationLevel().equals(RenovationLevel.GOOD_RENOVATION)) {
-            return 0d;
-        } else {
-            // calc the building age factor as initial score
-            Double score = ageFactor.calcFactor(building, simYear);
-
-            if (modifiers != null) {
-                for (Modifier modifier : modifiers) {
-                    if (modifier.isActive(simYear) && modifier.checkConditions(building)) {
-                        //LOGGER.log(Level.INFO, "Modifier {0} is active in sim year {1} for building {2}", new Object[]{modifier.getName(), simYear, building.getAlkisID()});
-                        score *= modifier.getImpactFactor();
-                    }
-                }
-            }
-
-            //LOGGER.log(Level.INFO, "Return scoring value for {0}/{1}:\t{2}", new Object[]{simYear, building.getAlkisID(), score});
-            return score;
-        }
-    }
-
     public static void main(String[] args) throws InputValidationException, IOException {
         Integer simStop = 2050;
 
@@ -281,8 +285,11 @@ public class Simulator extends Observable {
         //ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());
         //ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         //writer.writeValue(new File("simparams.json"), parameter);
-        IBuildingAgeFactor buildingAgeFactor = new SimpleBuildingAgeFactor();
-
+        List<ScoringMethod> scoringMethods = new ArrayList<>();
+        scoringMethods.add(new BuildingAgeFactor());
+        scoringMethods.add(new CO2EmissionFactor());
+        scoringMethods.add(new CO2EmissionSquareMeterFactor());
+        
         List<HeatingSystemExchangeRate> rates = new ArrayList<>();
         HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
@@ -290,15 +297,61 @@ public class Simulator extends Observable {
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
         rates.addAll(Arrays.asList(rate1, rate2));
 
-        IRenovationStrategy renovationStrategy = new RenovationHeatExchangeRateStrategy(1.5, 0.0, rates);
+        IRenovationStrategy renovationStrategy = new RenovationHeatExchangeRateStrategy(2.0, 0.0, rates);
 
         long startTime = System.currentTimeMillis();
         Simulator simulator = new Simulator();
-        SimulationResult result = simulator.simulate(parameter, buildingAgeFactor, renovationStrategy, (long) 821985);
+        SimulationResult result = simulator.simulate(parameter, scoringMethods, renovationStrategy, (long) 821985);
         long endTime = System.currentTimeMillis();
 
         System.out.println("Simulated scenario " + result.getName() + " in " + (endTime - startTime) + " ms");
         result.printHeatDemand();
         result.printRenovationLevelDemand();
+    }
+
+    /**
+     * Normalizes the scores for all given scored buildings and all applied scoring methods.
+     *
+     * @param scoredBuildings
+     */
+    private void normalizeScores(List<ScoredBuilding> scoredBuildings, List<ScoringMethod> scoringMethods) {
+        scoringMethods.stream().forEach(method -> {
+            Double min = scoredBuildings.parallelStream().mapToDouble(sb -> sb.getScores().get(method)).min().getAsDouble();
+            Double max = scoredBuildings.parallelStream().mapToDouble(sb -> sb.getScores().get(method)).max().getAsDouble();
+
+            scoredBuildings.parallelStream().forEach(sb -> {
+                Double score = sb.getScores().get(method);
+                Double nValue = (score - min) / (max - min);
+
+                sb.getScores().put(method, nValue);
+            });
+        });
+    }
+
+    /**
+     * Combines the different scoring values for the different scoring methods to one combined value: 1/N * (x1 + x2 + ... xi)
+     *
+     * @param scoredBuildings
+     */
+    private void combineScores(List<ScoredBuilding> scoredBuildings) {
+        scoredBuildings.parallelStream().forEach(sb -> {
+            Double value = (1 / ((double) sb.getScores().size())) * (sb.getScores().values().stream().mapToDouble(Double::doubleValue).sum());
+            sb.setCombinedScore(value);
+        });
+    }
+
+    /**
+     * Print the given list of scored buildings to the console.
+     * 
+     * @param scoredBuildings 
+     */
+    private void printScoredBuilding(List<ScoredBuilding> scoredBuildings) {
+        scoredBuildings.parallelStream().forEachOrdered(building -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(building.getBuilding().getAlkisID()).append("\t");
+            building.getScores().values().forEach(value -> sb.append(value).append("\t"));
+            sb.append(building.getCombinedScore());
+            System.out.println(sb.toString());
+        });
     }
 }

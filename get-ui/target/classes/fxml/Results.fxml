@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1047.0" prefWidth="1436.0" style="-fx-background-color: WhiteSmoke;" stylesheets="@../styles/bootstrap3.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.hawhh.gewiss.get.fx.controller.ResultsController">
+    <top>
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Results: Simulation" BorderPane.alignment="CENTER_LEFT">
+            <font>
+                <Font size="24.0" />
+            </font>
+            <BorderPane.margin>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </BorderPane.margin>
+        </Text>
+    </top>
+   <center>
+      <Accordion fx:id="accordion" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="1000.0" BorderPane.alignment="CENTER">
+         <panes>
+                <TitledPane fx:id="tpChartResults" animated="false" text="Chart">
+                    <content>
+                        <VBox style="-fx-background-color: WhiteSmoke;">
+                            <fx:include fx:id="chartResults" source="ChartResults.fxml" />
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <TitledPane fx:id="tpMapResults" animated="false" expanded="false" text="Map">
+                    <content>
+                        <VBox style="-fx-background-color: WhiteSmoke;">
+                            <fx:include fx:id="mapResults" source="MapResults.fxml" />
+                        </VBox>
+                    </content>
+                </TitledPane>
+            <TitledPane animated="false" text="Export (Files)">
+              <content>
+                  <VBox style="-fx-background-color: WhiteSmoke;">
+                      <fx:include fx:id="exportFiles" source="ExportFiles.fxml" />
+                  </VBox>
+              </content>
+            </TitledPane>
+                <TitledPane fx:id="tpExportResults" animated="false" expanded="false" text="Export (GeHIT Database)">
+                    <content>
+                        <VBox style="-fx-background-color: WhiteSmoke;">
+                            <fx:include fx:id="exportResults" source="ExportResults.fxml" />
+                        </VBox>
+                    </content>
+                </TitledPane>
+         </panes>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </Accordion>
+   </center>
+</BorderPane>

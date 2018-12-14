@@ -12,14 +12,16 @@ import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.fx.ExceptionDialog;
 import de.hawhh.gewiss.get.fx.SimulationResultHolder;
 import de.hawhh.gewiss.get.simulator.Simulator;
-import de.hawhh.gewiss.get.simulator.baf.IBuildingAgeFactor;
-import de.hawhh.gewiss.get.simulator.baf.SimpleBuildingAgeFactor;
 import de.hawhh.gewiss.get.simulator.db.dao.BuildingDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.DistrictQuarterDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.SQLiteBuildingDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.SQLiteDistrictQuarterDAO;
 import de.hawhh.gewiss.get.simulator.renovation.IRenovationStrategy;
 import de.hawhh.gewiss.get.simulator.renovation.RenovationHeatExchangeRateStrategy;
+import de.hawhh.gewiss.get.simulator.scoring.BuildingAgeFactor;
+import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionFactor;
+import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionSquareMeterFactor;
+import de.hawhh.gewiss.get.simulator.scoring.ScoringMethod;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -271,9 +273,16 @@ public class InputController implements Observer {
                 });
                 SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers);
 
-                // Building age favtor
-                IBuildingAgeFactor buildingAgeFactor = new SimpleBuildingAgeFactor();
-
+                // Ranking/scoring methods
+                List<ScoringMethod> scoringMethods = new ArrayList<>();
+                if (initialParametersController.getSelectedRankingMethods().contains(InitialParametersController.BUILDING_AGE)) {
+                    scoringMethods.add(new BuildingAgeFactor());
+                } else if (initialParametersController.getSelectedRankingMethods().contains(InitialParametersController.CO2_EMISSION)) {
+                    scoringMethods.add(new CO2EmissionFactor());
+                } else if (initialParametersController.getSelectedRankingMethods().contains(InitialParametersController.CO2_EMISSION_SQUARE_METER)) {
+                    scoringMethods.add(new CO2EmissionSquareMeterFactor());
+                }
+                
                 // Renovation strategy
                 Double renovationRate = initialParametersController.getRenovationRate();
                 Double passiveHouseRate = initialParametersController.getPassiveHouseRate();
@@ -286,8 +295,11 @@ public class InputController implements Observer {
                 // Tell the main controller that the simulation is going to start, so the panel is switched
                 mainController.simulationStart(name);
 
+                // Clear the old sim result to free memory
+                SimulationResultHolder.getInstance().setResult(null);
+                
                 long startTime = System.currentTimeMillis();
-                SimulationResult result = simulator.simulate(parameters, buildingAgeFactor, renovationStrategy, seed);
+                SimulationResult result = simulator.simulate(parameters, scoringMethods, renovationStrategy, seed);
                 long endTime = System.currentTimeMillis();
                 long runTime = endTime - startTime;
 

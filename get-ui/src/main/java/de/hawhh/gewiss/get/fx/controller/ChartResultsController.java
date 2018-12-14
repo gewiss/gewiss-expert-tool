@@ -84,202 +84,204 @@ public class ChartResultsController {
             }
 
             // HEAT_DEMAND_MODE
-            if (modeBox.getValue().equals(HEAT_DEMAND_MODE)) {
-                resultChart.getData().clear();
+            if (modeBox != null && modeBox.getValue() != null) {
+                if (modeBox.getValue().equals(HEAT_DEMAND_MODE)) {
+                    resultChart.getData().clear();
 
-                xAxis = (NumberAxis) resultChart.getXAxis();
-                xAxis.setAutoRanging(false);
-                yAxis = (NumberAxis) resultChart.getYAxis();
-                yAxis.setAutoRanging(true);
-                //yAxis.setAutoRanging(false);
+                    xAxis = (NumberAxis) resultChart.getXAxis();
+                    xAxis.setAutoRanging(false);
+                    yAxis = (NumberAxis) resultChart.getYAxis();
+                    yAxis.setAutoRanging(true);
+                    //yAxis.setAutoRanging(false);
 
-                Integer firstYear = Collections.min(result.getOutput().keySet());
-                Integer lastYear = Collections.max(result.getOutput().keySet());
+                    Integer firstYear = Collections.min(result.getOutput().keySet());
+                    Integer lastYear = Collections.max(result.getOutput().keySet());
 
-                xAxis.setLabel("Time (years)");
-                xAxis.setLowerBound(firstYear - 1);
-                xAxis.setUpperBound(lastYear + 1);
+                    xAxis.setLabel("Time (years)");
+                    xAxis.setLowerBound(firstYear - 1);
+                    xAxis.setUpperBound(lastYear + 1);
 
-                XYChart.Series<Number, Number> heatDemandSeries = new XYChart.Series<>();
-                heatDemandSeries.setName("Overall yearly heat demand");
+                    XYChart.Series<Number, Number> heatDemandSeries = new XYChart.Series<>();
+                    heatDemandSeries.setName("Overall yearly heat demand");
 
-                Map<Integer, Double> heatDemands = result.getYearlyHeatDemand(location);
-                heatDemands.keySet().stream().forEach(year -> {
-                    Double heatDemand = heatDemands.get(year);
-                    XYChart.Data data = new XYChart.Data(year, heatDemand);
-                    heatDemandSeries.getData().add(data);
-                });
+                    Map<Integer, Double> heatDemands = result.getYearlyHeatDemand(location);
+                    heatDemands.keySet().stream().forEach(year -> {
+                        Double heatDemand = heatDemands.get(year);
+                        XYChart.Data data = new XYChart.Data(year, heatDemand);
+                        heatDemandSeries.getData().add(data);
+                    });
 
-                Double minHeatDemand = heatDemandSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double maxHeatDemand = heatDemandSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double minHeatDemand = heatDemandSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double maxHeatDemand = heatDemandSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
 
-                yAxis.setLabel("Overall yearly heat demand (kWh/m^2)");
-                yAxis.setLowerBound(minHeatDemand);
-                yAxis.setUpperBound(maxHeatDemand);
+                    yAxis.setLabel("Overall yearly heat demand (kWh/m^2)");
+                    yAxis.setLowerBound(minHeatDemand);
+                    yAxis.setUpperBound(maxHeatDemand);
 
-                resultChart.getData().add(heatDemandSeries);
+                    resultChart.getData().add(heatDemandSeries);
 
-                heatDemandSeries.getData().stream().forEach(date -> {
-                    Tooltip.install(date.getNode(), new Tooltip(
-                            "year: " + "\t \t" + date.getXValue().toString() + "\n" + "heat demand: " + "\t" + date.getYValue().toString())
-                    );
-                });
+                    heatDemandSeries.getData().stream().forEach(date -> {
+                        Tooltip.install(date.getNode(), new Tooltip(
+                                "year: " + "\t \t" + date.getXValue().toString() + "\n" + "heat demand: " + "\t" + date.getYValue().toString())
+                        );
+                    });
 
-            } // RENOVATION_LEVEL_MODE
-            else if (modeBox.getValue().equals(RENOVATION_LEVEL_MODE)) {
-                resultChart.getData().clear();
+                } // RENOVATION_LEVEL_MODE
+                else if (modeBox.getValue().equals(RENOVATION_LEVEL_MODE)) {
+                    resultChart.getData().clear();
 
-                xAxis = (NumberAxis) resultChart.getXAxis();
-                xAxis.setAutoRanging(false);
-                yAxis = (NumberAxis) resultChart.getYAxis();
-                yAxis.setAutoRanging(true);
+                    xAxis = (NumberAxis) resultChart.getXAxis();
+                    xAxis.setAutoRanging(false);
+                    yAxis = (NumberAxis) resultChart.getYAxis();
+                    yAxis.setAutoRanging(true);
 //                yAxis.setAutoRanging(false);
 
-                Integer firstYear = Collections.min(result.getOutput().keySet());
-                Integer lastYear = Collections.max(result.getOutput().keySet());
+                    Integer firstYear = Collections.min(result.getOutput().keySet());
+                    Integer lastYear = Collections.max(result.getOutput().keySet());
 
-                xAxis.setLabel("Time (years)");
-                xAxis.setLowerBound(firstYear - 1);
-                xAxis.setUpperBound(lastYear + 1);
+                    xAxis.setLabel("Time (years)");
+                    xAxis.setLowerBound(firstYear - 1);
+                    xAxis.setUpperBound(lastYear + 1);
 
-                XYChart.Series<Number, Number> noRenovationLevelSeries = new XYChart.Series<>();
-                XYChart.Series<Number, Number> basicRenovationLevelSeries = new XYChart.Series<>();
-                XYChart.Series<Number, Number> goodRenovationLevelSeries = new XYChart.Series<>();
-                noRenovationLevelSeries.setName("No renovation level");
-                basicRenovationLevelSeries.setName("Basic renovation level (EnEV 2014)");
-                goodRenovationLevelSeries.setName("Good renovation level (Passive House)");
+                    XYChart.Series<Number, Number> noRenovationLevelSeries = new XYChart.Series<>();
+                    XYChart.Series<Number, Number> basicRenovationLevelSeries = new XYChart.Series<>();
+                    XYChart.Series<Number, Number> goodRenovationLevelSeries = new XYChart.Series<>();
+                    noRenovationLevelSeries.setName("No renovation level");
+                    basicRenovationLevelSeries.setName("Basic renovation level (EnEV 2014)");
+                    goodRenovationLevelSeries.setName("Good renovation level (Passive House)");
 
-                Map<Integer, Triplet<Long, Long, Long>> renovationLevels = result.getRenovationLevels(location);
-                renovationLevels.keySet().forEach(year -> {
-                    XYChart.Data dataNoRenovation = new XYChart.Data(year, renovationLevels.get(year).getValue0());
-                    XYChart.Data dataBasicRenovation = new XYChart.Data(year, renovationLevels.get(year).getValue1());
-                    XYChart.Data dataGoodRenovation = new XYChart.Data(year, renovationLevels.get(year).getValue2());
+                    Map<Integer, Triplet<Long, Long, Long>> renovationLevels = result.getRenovationLevels(location);
+                    renovationLevels.keySet().forEach(year -> {
+                        XYChart.Data dataNoRenovation = new XYChart.Data(year, renovationLevels.get(year).getValue0());
+                        XYChart.Data dataBasicRenovation = new XYChart.Data(year, renovationLevels.get(year).getValue1());
+                        XYChart.Data dataGoodRenovation = new XYChart.Data(year, renovationLevels.get(year).getValue2());
 
-                    basicRenovationLevelSeries.getData().add(dataBasicRenovation);
-                    noRenovationLevelSeries.getData().add(dataNoRenovation);
-                    goodRenovationLevelSeries.getData().add(dataGoodRenovation);
-                });
+                        basicRenovationLevelSeries.getData().add(dataBasicRenovation);
+                        noRenovationLevelSeries.getData().add(dataNoRenovation);
+                        goodRenovationLevelSeries.getData().add(dataGoodRenovation);
+                    });
 
-                Double minNoRenovationLevel = noRenovationLevelSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double maxNoRenovationLevel = noRenovationLevelSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double minBasicRenovationLevel = basicRenovationLevelSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double maxBasicRenovationLevel = basicRenovationLevelSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double minGoodRenovationLevel = goodRenovationLevelSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double maxGoodRenovationLevel = goodRenovationLevelSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double minNoRenovationLevel = noRenovationLevelSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double maxNoRenovationLevel = noRenovationLevelSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double minBasicRenovationLevel = basicRenovationLevelSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double maxBasicRenovationLevel = basicRenovationLevelSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double minGoodRenovationLevel = goodRenovationLevelSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double maxGoodRenovationLevel = goodRenovationLevelSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
 
-                Double minRenovationLevel = Math.min(minGoodRenovationLevel, Math.min(minNoRenovationLevel, minBasicRenovationLevel));
-                Double maxRenovationLevel = Math.max(maxGoodRenovationLevel, Math.max(maxNoRenovationLevel, maxBasicRenovationLevel));
+                    Double minRenovationLevel = Math.min(minGoodRenovationLevel, Math.min(minNoRenovationLevel, minBasicRenovationLevel));
+                    Double maxRenovationLevel = Math.max(maxGoodRenovationLevel, Math.max(maxNoRenovationLevel, maxBasicRenovationLevel));
 
-                yAxis.setLabel("Number of buildings");
-                yAxis.setLowerBound(minRenovationLevel);
-                yAxis.setUpperBound(maxRenovationLevel);
+                    yAxis.setLabel("Number of buildings");
+                    yAxis.setLowerBound(minRenovationLevel);
+                    yAxis.setUpperBound(maxRenovationLevel);
 
-                resultChart.getData().add(noRenovationLevelSeries);
-                resultChart.getData().add(basicRenovationLevelSeries);
-                resultChart.getData().add(goodRenovationLevelSeries);
+                    resultChart.getData().add(noRenovationLevelSeries);
+                    resultChart.getData().add(basicRenovationLevelSeries);
+                    resultChart.getData().add(goodRenovationLevelSeries);
 
-                noRenovationLevelSeries.getData().stream().forEach(date -> {
-                    Tooltip.install(date.getNode(), new Tooltip(
-                            "year:" + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
-                    );
-                });
+                    noRenovationLevelSeries.getData().stream().forEach(date -> {
+                        Tooltip.install(date.getNode(), new Tooltip(
+                                "year:" + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
+                        );
+                    });
 
-                basicRenovationLevelSeries.getData().stream().forEach(date -> {
-                    Tooltip.install(date.getNode(), new Tooltip(
-                            "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
-                    );
-                });
+                    basicRenovationLevelSeries.getData().stream().forEach(date -> {
+                        Tooltip.install(date.getNode(), new Tooltip(
+                                "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
+                        );
+                    });
 
-                goodRenovationLevelSeries.getData().stream().forEach(date -> {
-                    Tooltip.install(date.getNode(), new Tooltip(
-                            "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
-                    );
-                });
+                    goodRenovationLevelSeries.getData().stream().forEach(date -> {
+                        Tooltip.install(date.getNode(), new Tooltip(
+                                "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
+                        );
+                    });
 
-                // RENOVATION_COST_MODE
-            } else if (modeBox.getValue().equals(RENOVATION_COST_MODE)) {
+                    // RENOVATION_COST_MODE
+                } else if (modeBox.getValue().equals(RENOVATION_COST_MODE)) {
 
-                resultChart.getData().clear();
+                    resultChart.getData().clear();
 
-                xAxis = (NumberAxis) resultChart.getXAxis();
-                xAxis.setAutoRanging(false);
-                yAxis = (NumberAxis) resultChart.getYAxis();
-                yAxis.setAutoRanging(true);
-                //yAxis.setAutoRanging(false);
+                    xAxis = (NumberAxis) resultChart.getXAxis();
+                    xAxis.setAutoRanging(false);
+                    yAxis = (NumberAxis) resultChart.getYAxis();
+                    yAxis.setAutoRanging(true);
+                    //yAxis.setAutoRanging(false);
 
-                Integer firstYear = Collections.min(result.getOutput().keySet());
-                Integer lastYear = Collections.max(result.getOutput().keySet());
+                    Integer firstYear = Collections.min(result.getOutput().keySet());
+                    Integer lastYear = Collections.max(result.getOutput().keySet());
 
-                xAxis.setLabel("Time (years)");
-                xAxis.setLowerBound(firstYear - 1);
-                xAxis.setUpperBound(lastYear + 1);
+                    xAxis.setLabel("Time (years)");
+                    xAxis.setLowerBound(firstYear - 1);
+                    xAxis.setUpperBound(lastYear + 1);
 
-                XYChart.Series<Number, Number> renovationCostSeries = new XYChart.Series<>();
-                renovationCostSeries.setName("Overall yearly renovation costs");
+                    XYChart.Series<Number, Number> renovationCostSeries = new XYChart.Series<>();
+                    renovationCostSeries.setName("Overall yearly renovation costs");
 
-                Map<Integer, Double> costsMap = result.getRenovationCosts(location);
-                costsMap.keySet().forEach(year -> {
-                    Double costs = costsMap.get(year);
-                    XYChart.Data data = new XYChart.Data(year, costs);
-                    renovationCostSeries.getData().add(data);
-                });
+                    Map<Integer, Double> costsMap = result.getRenovationCosts(location);
+                    costsMap.keySet().forEach(year -> {
+                        Double costs = costsMap.get(year);
+                        XYChart.Data data = new XYChart.Data(year, costs);
+                        renovationCostSeries.getData().add(data);
+                    });
 
-                Double minRenovationCosts = renovationCostSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double maxRenovationCosts = renovationCostSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double minRenovationCosts = renovationCostSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double maxRenovationCosts = renovationCostSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
 
-                yAxis.setLabel("Overall yearly renovation costs (EUR)");
-                yAxis.setLowerBound(minRenovationCosts);
-                yAxis.setUpperBound(maxRenovationCosts);
+                    yAxis.setLabel("Overall yearly renovation costs (EUR)");
+                    yAxis.setLowerBound(minRenovationCosts);
+                    yAxis.setUpperBound(maxRenovationCosts);
 
-                resultChart.getData().add(renovationCostSeries);
+                    resultChart.getData().add(renovationCostSeries);
 
-                renovationCostSeries.getData().stream().forEach(date -> {
-                    Tooltip.install(date.getNode(), new Tooltip(
-                            "year: " + "\t" + date.getXValue().toString() + "\n" + "costs: " + "\t" + date.getYValue().toString())
-                    );
-                });
-                // CO2_EMISSION_MODE
-            } else if (modeBox.getValue().equals(CO2_EMISSION_MODE)) {
+                    renovationCostSeries.getData().stream().forEach(date -> {
+                        Tooltip.install(date.getNode(), new Tooltip(
+                                "year: " + "\t" + date.getXValue().toString() + "\n" + "costs: " + "\t" + date.getYValue().toString())
+                        );
+                    });
+                    // CO2_EMISSION_MODE
+                } else if (modeBox.getValue().equals(CO2_EMISSION_MODE)) {
 
-                resultChart.getData().clear();
+                    resultChart.getData().clear();
 
-                xAxis = (NumberAxis) resultChart.getXAxis();
-                xAxis.setAutoRanging(false);
-                yAxis = (NumberAxis) resultChart.getYAxis();
-                yAxis.setAutoRanging(true);
-                //yAxis.setAutoRanging(false);
+                    xAxis = (NumberAxis) resultChart.getXAxis();
+                    xAxis.setAutoRanging(false);
+                    yAxis = (NumberAxis) resultChart.getYAxis();
+                    yAxis.setAutoRanging(true);
+                    //yAxis.setAutoRanging(false);
 
-                Integer firstYear = Collections.min(result.getOutput().keySet());
-                Integer lastYear = Collections.max(result.getOutput().keySet());
+                    Integer firstYear = Collections.min(result.getOutput().keySet());
+                    Integer lastYear = Collections.max(result.getOutput().keySet());
 
-                xAxis.setLabel("Time (years)");
-                xAxis.setLowerBound(firstYear - 1);
-                xAxis.setUpperBound(lastYear + 1);
+                    xAxis.setLabel("Time (years)");
+                    xAxis.setLowerBound(firstYear - 1);
+                    xAxis.setUpperBound(lastYear + 1);
 
-                XYChart.Series<Number, Number> co2EmissionSeries = new XYChart.Series<>();
-                co2EmissionSeries.setName("Overall yearly CO2 emissions");
+                    XYChart.Series<Number, Number> co2EmissionSeries = new XYChart.Series<>();
+                    co2EmissionSeries.setName("Overall yearly CO2 emissions");
 
-                Map<Integer, Double> emissionsMap = result.getCO2Emissions(location);
-                emissionsMap.keySet().forEach(year -> {
-                    Double emission = emissionsMap.get(year);
-                    XYChart.Data data = new XYChart.Data(year, emission);
-                    co2EmissionSeries.getData().add(data);
-                });
+                    Map<Integer, Double> emissionsMap = result.getCO2Emissions(location);
+                    emissionsMap.keySet().forEach(year -> {
+                        Double emission = emissionsMap.get(year);
+                        XYChart.Data data = new XYChart.Data(year, emission);
+                        co2EmissionSeries.getData().add(data);
+                    });
 
-                Double minCo2Emissions = co2EmissionSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
-                Double maxCo2Emissions = co2EmissionSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double minCo2Emissions = co2EmissionSeries.getData().stream().min((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
+                    Double maxCo2Emissions = co2EmissionSeries.getData().stream().max((data1, data2) -> Double.compare(data1.getYValue().doubleValue(), data2.getYValue().doubleValue())).get().getYValue().doubleValue();
 
-                yAxis.setLabel("Overall yearly CO2 emissions (t)");
-                yAxis.setLowerBound(minCo2Emissions);
-                yAxis.setUpperBound(maxCo2Emissions);
+                    yAxis.setLabel("Overall yearly CO2 emissions (t)");
+                    yAxis.setLowerBound(minCo2Emissions);
+                    yAxis.setUpperBound(maxCo2Emissions);
 
-                resultChart.getData().add(co2EmissionSeries);
+                    resultChart.getData().add(co2EmissionSeries);
 
-                co2EmissionSeries.getData().stream().forEach(date -> {
-                    Tooltip.install(date.getNode(), new Tooltip(
-                            "year: " + "\t \t \t" + date.getXValue().toString() + "\n" + "CO2 emissions: " + "\t" + String.format("%.2f", date.getYValue()))
-                    );
-                });
+                    co2EmissionSeries.getData().stream().forEach(date -> {
+                        Tooltip.install(date.getNode(), new Tooltip(
+                                "year: " + "\t \t \t" + date.getXValue().toString() + "\n" + "CO2 emissions: " + "\t" + String.format("%.2f", date.getYValue()))
+                        );
+                    });
+                }
             }
         }
     }
@@ -314,18 +316,18 @@ public class ChartResultsController {
                         length = series.getData().size();
                     }
                 }
-                
+
                 // iterate over length of all series
                 for (int i = 0; i <= length; i++) {
                     boolean first = true;
                     List<String> record = new ArrayList<>();
-                    
+
                     // iterate over all series
                     for (XYChart.Series<Number, Number> series : dataSeries) {
                         ObservableList<XYChart.Data<Number, Number>> dataList = series.getData();
                         if (i < dataList.size()) {
                             XYChart.Data<Number, Number> data = dataList.get(i);
-                            
+
                             // only add the year (x value) for the first record entry
                             if (first) {
                                 record.add(data.getXValue().toString());
@@ -335,10 +337,10 @@ public class ChartResultsController {
                             record.add(data.getYValue().toString());
                         }
                     }
-                    
+
                     csvPrinter.printRecord(record);
                 }
-                
+
                 csvPrinter.flush();
             } catch (IOException ex) {
                 Logger.getLogger(ChartResultsController.class.getName()).log(Level.SEVERE, null, ex);

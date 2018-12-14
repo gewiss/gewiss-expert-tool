@@ -1,0 +1,11 @@
+de\hawhh\gewiss\get\simulator\db\dao\SQLiteBuildingDAOTest.class
+de\hawhh\gewiss\get\simulator\db\dao\SQLiteEnergySourceDAOTest.class
+de\hawhh\gewiss\get\simulator\scoring\BuildingAgeFactorTest.class
+de\hawhh\gewiss\get\simulator\db\dao\ConstructionAgeClassDAOTest.class
+de\hawhh\gewiss\get\simulator\db\dao\SQLiteDistrictQuarterDAOTest.class
+de\hawhh\gewiss\get\simulator\SimulatorTest.class
+de\hawhh\gewiss\get\core\input\ModifierTest.class
+de\hawhh\gewiss\get\core\model\BuildingTest.class
+de\hawhh\gewiss\get\simulator\db\dao\HeatDemandDAOTest.class
+de\hawhh\gewiss\get\simulator\db\dao\RenovationCostDAOTest.class
+de\hawhh\gewiss\get\core\input\HeatingSystemExchangeRateTest.class

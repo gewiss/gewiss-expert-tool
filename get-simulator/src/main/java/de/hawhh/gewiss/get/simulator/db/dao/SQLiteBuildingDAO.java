@@ -55,7 +55,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
 
         // WG + NWG
         String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist"
-                + " FROM gewiss_buildings_v_1 WHERE nwg_typ NOT LIKE 'kein_Bedarf'";
+                + " FROM gewiss_buildings_v_1 WHERE nwg_typ NOT LIKE 'kein_Bedarf' AND NOT(iwu_typ LIKE '_' AND nwg_typ LIKE '_')";
 
         // just WG
         //String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist FROM gewiss_buildings_v_1 WHERE iwu_typ NOT LIKE '_'";

@@ -3,6 +3,7 @@ package de.hawhh.gewiss.get.fx;
 import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -26,13 +27,19 @@ public class GETApp extends Application {
         //scene.getStylesheets().add("/styles/Styles.css");
         //scene.getStylesheets().add("/styles/bootstrap3.css");
         
-        stage.setTitle("GEWISS Expert Tool (GET v0.1.1)");
+        stage.setTitle("GEWISS Expert Tool (GET v0.2)");
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icon/cityscape.png")));
         
         stage.setScene(scene);
         // start the application maximized
         //stage.setMaximized(true);
         stage.show();
+        
+        // Set on close to make sure all child threads are interrupted as well
+        stage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     /**
@@ -44,7 +51,7 @@ public class GETApp extends Application {
         LOGGER.info("Application started");
         
         // set the ArcGIS license
-        // ArcGISRuntimeEnvironment.setLicense("YOUR-LICENCE-KEY");
+        ArcGISRuntimeEnvironment.setLicense("runtimelite,1000,rud9301301549,none,0JMFA0PL400L6XCFK106");
 
         // Start the actual application
         Application.launch(args);

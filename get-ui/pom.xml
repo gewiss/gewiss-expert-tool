@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.hawhh.gewiss</groupId>
     <artifactId>get-ui</artifactId>
-    <version>0.1.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
     
     <name>GET-UI</name>
@@ -64,12 +64,12 @@
         <dependency>
             <groupId>com.esri.arcgisruntime</groupId>
             <artifactId>arcgis-java</artifactId>
-            <version>100.2.1</version>
+            <version>100.4.0</version>
         </dependency>
         <dependency>
             <groupId>de.hawhh.gewiss</groupId>
             <artifactId>get-simulator</artifactId>
-            <version>0.1.1</version>
+            <version>0.2</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -168,7 +168,7 @@
                 <artifactId>arcgis-java-maven-plugin</artifactId>
                 <version>1.0</version>
                 <configuration>
-                    <version>100.2.1</version>
+                    <version>100.4.0</version>
                 </configuration>
             </plugin> 
         </plugins>

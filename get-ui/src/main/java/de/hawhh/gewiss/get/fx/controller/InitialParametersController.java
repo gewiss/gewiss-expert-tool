@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
+import org.controlsfx.control.CheckComboBox;
 
 /**
  * Controller for the InitialParameter.fxml view.
@@ -20,6 +21,10 @@ import javafx.util.converter.DoubleStringConverter;
  * @author Thomas Preisler
  */
 public class InitialParametersController {
+    
+    public static final String BUILDING_AGE = "Building Age/Last Renovation";
+    public static final String CO2_EMISSION = "CO2 Emission";
+    public static final String CO2_EMISSION_SQUARE_METER = "CO2 Emission (m^2)";
 
     // Initial simulation parameters
     @FXML
@@ -32,6 +37,8 @@ public class InitialParametersController {
     private TextField globalPassiveHouse;
     @FXML
     private TextField globalSeed;
+    @FXML
+    private CheckComboBox<String> rankingMethods;
 
     // Heating System Exchange Table
     @FXML
@@ -267,6 +274,9 @@ public class InitialParametersController {
     public void init() {
         initHeatExchangeTable();
         initTextFieldValidators();
+        
+        rankingMethods.getItems().addAll(BUILDING_AGE, CO2_EMISSION, CO2_EMISSION_SQUARE_METER);
+        rankingMethods.getCheckModel().check(0);
     }
     
     public Integer getSimulationUntil() {
@@ -291,5 +301,9 @@ public class InitialParametersController {
     
     public Long getSeed() {
         return Long.parseLong(globalSeed.getText());
+    }
+    
+    public List<String> getSelectedRankingMethods() {
+        return rankingMethods.getCheckModel().getCheckedItems();
     }
 }
