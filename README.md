@@ -40,19 +40,19 @@ The following briefly describes the SQL-tables required for the simulation tool.
 |-------------  |---------- |-------------|
 | alkis_id      | String    | Unique Building ID |
 | geomwkt       | String    | 2D Geometrie in WKT format |
-| wohnfl        | Double    | Living Area in square meter |
+| wohnfl        | Double    | Living Floor Area in square meter |
 | nwg_ngf       | Double    | Square meter of usage space for non-residential buildings |
 | bezirk        | String    | The city district |
 | stadtteil     | String    | The city quarter |
-| stat_gebiet   | String    | Statistical area (below quarter) |
-| baublock      | String    | Building block (below statistical quarter) |
+| stat_gebiet   | String    | Statistical area (smaller than quarter) |
+| baublock      | String    | Urban block (smaller than statistical area) |
 | bj_alk_dt     | Integer   | Year of construction |
 | dt_san_year   | Integer   | Last year of renovation |
 | dt_heiztyp    | String    | Heating system type |
 | iwu_typ       | String    | Residential building type |
 | nwg_typ       | String    | Non-residential building type |
 | bak_fin       | String    | Construction age class |
-| cluster       | String    | ID of building cluster |
+| cluster       | String    | ID of building cluster, not used for computation, but retained to allow publishing of results |
 
 #### Table baualtersklassen (Construction age class)
 | Column Name   | Type      | Description |
@@ -61,17 +61,6 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | von           | Integer   | From year |
 | bis           | Integer   | To year|
 
-#### Table waermebedarf (Heat demand)
-| Column Name   | Type      | Description |
-|-------------  |---------- |-------------|
-| typ           | String    | Building type |
-| warmwasser0   | Double    | Warm water heat demand (non renovated) |
-| warmwasser1   | Double    | Warm water heat demand (EnEV 2014 standard) |
-| warmwasser2   | Double    | Warm water heat demand (Passive house standard) |
-| heizwaerme0   | Double    | Heat demand (non renovated) |
-| heizwaerme1   | Double    | Heat demand (EnEV 2014 standard) |
-| heizwaerme2   | Double    | Heat demand (Passive house standard) |
-
 #### Table districts_and_quarters (City districts and quarters)
 | Column Name   | Type      | Description |
 |-------------  |---------- |-------------|
@@ -79,13 +68,50 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | district      | String    | Name of the district |
 | quarter       | String    | Name of the quarter |
 
-#### Table primary_energy_factor_co2_factor (Primary energy and CO<sub>2</sub> factors)
+#### Table heat_demand_and_load_at_generation
+| Column Name   | Type      | Description |
+|-------------  |---------- |-------------|
+| id                    | Integer   | Unique table id |
+| BUILD_TYPE            | String    | Building type |
+| RENOVATION_LEVEL      | Integer   | 0,1,2 for baseline, EnEV 2014, Passive house |
+| SPACE_HEATING_DEMAND  | Double    | Demand for space heating needed as generation output (kWh/m<sup>2</sup>) |
+| WARMWATER_DEMAND      | Double    | Demand for domestic hot water as generation ouput (kWh/m<sup>2</sup>) |
+| SPACE_HEATING_LOAD    | Double    | Peak heat load for space heating (kW/m2) |
+| WARMWATER_LOAD        | Double    | Peak heat load for domestic hot water (kW/m2) |
+
+#### Table heat_demand_and_final_energy
+| Column Name   | Type      | Description |
+|-------------  |---------- |-------------|
+| id               | Integer   | Unique table id |
+| BUILD_TYPE       | String    | Building type |
+| RENOVATION_LEVEL | Integer   | 0,1,2 for baseline, EnEV 2014, Passive house |
+| HEATING_SYSTEM   | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| FINAL_ENERGY     | Double    | Demand for space heating and domestic hot water as final energy (kWh/m<sup>2</sup>) |
+
+#### Table primary_energy_factors
 | Column Name               | Type      | Description |
 |-------------------------- |---------- |-------------|
 | id                        | Integer   | Unique table id |
-| typ                       | String    | Type of the heating system |
-| Primaerenergiefaktor      | Double    | Primary energy factor of the heating system type |
-| CO2                       | Double    | CO<sub>2</sub> factor of the heating system type |
+| HEATING_SYSTEM            | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| ENERGY_SOURCE_TYPE        | String    | type of energy source, f.ex "NATURAL_GAS", used only for information |
+| PRIMARY_ENERGY_FACTOR     | Double    | Primary energy factor of the heating system type (ratio) |
+| CO2                       | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>|
+
+#### Table costs_building_shell
+| Column Name   | Type      | Description |
+|-------------  |---------- |-------------|
+| id                    | Integer   | Unique table id |
+| BUILD_TYPE            | String    | Building type |
+| RENOVATION_LEVEL      | Integer   | 0,1,2 for baseline, EnEV 2014, Passive house |
+| COST_PER_SQ_METER     | Double    | costs for renovation of the building shell (euro/m<sup>2</sup>) |
+
+#### Table costs_heating_system
+| Column Name   | Type      | Description |
+|-------------  |---------- |-------------|
+| id               | Integer   | Unique table id |
+| HEAT_LOAD_kW     | Integer   | The peak heat load needed, f.ex. 5, 15, 25 kW   |
+| HEATING_SYSTEM   | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| COST             | Double    | total cost (euro) for exchanging the old heating system with this system |
 
 ## Building and Running the Application
 The application is based on  [Apache Maven](https://maven.apache.org/) so, once you have checked out the repository you can either import the Maven projects `get-simulator` (simulation logic) and `get-ui` (JavaFX UI) to the IDE of your choice (we used Netbeans, but Eclipse or IntelliJ work as well) to build and run the it or use Maven and the command line, as decribed in the following part.
