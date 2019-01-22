@@ -1,12 +1,12 @@
 package de.hawhh.gewiss.get.simulator.db.dao;
 
 import de.hawhh.gewiss.get.core.model.Building;
-import java.util.List;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Test class for {@link SQLiteBuildingDAO}.
@@ -30,12 +30,13 @@ public class SQLiteBuildingDAOTest {
         System.out.println("findAll");
 
         List<Building> result = dao.findAll();
+
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
 
     @Test
-    public void testFindById() throws Exception {
+    public void testFindById() {
         String buildingID;
         if (SQLiteConnection.DB_FILE.contains("anonymized")) {
             buildingID = "1";
@@ -56,9 +57,9 @@ public class SQLiteBuildingDAOTest {
         assertNotNull(types);
 
         if (SQLiteConnection.DB_FILE.contains("anonymized")) {
-            assertTrue(types.size() == 30);
+            assertEquals(30, types.size());
         } else {
-            assertTrue(types.size() == 43);
+            assertEquals(43, types.size());
         }
     }
 
@@ -68,9 +69,9 @@ public class SQLiteBuildingDAOTest {
         assertNotNull(types);
 
         if (SQLiteConnection.DB_FILE.contains("anonymized")) {
-            assertTrue(types.size() == 11);
+            assertEquals(11, types.size());
         } else {
-            assertTrue(types.size() == 19);
+            assertEquals(19, types.size());
         }
     }
 }

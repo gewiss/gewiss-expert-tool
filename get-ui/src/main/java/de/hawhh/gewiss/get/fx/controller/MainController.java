@@ -1,8 +1,6 @@
 package de.hawhh.gewiss.get.fx.controller;
 
 import de.hawhh.gewiss.get.fx.SimulationResultHolder;
-import java.util.Objects;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -10,6 +8,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+
+import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * Main controller of the Simbar application. Used for inter-controller communication, in case UI elements have to be update from another controller.
@@ -60,10 +61,12 @@ public class MainController {
         alert.setTitle("About");
         alert.setHeaderText(null);
         alert.setContentText(""
-                + "The GEWISS Simulation Tool has been developed by:\n"
+                + "The GEWISS Simulation Tool was developed by:\n"
                 + "- Thomas Preisler (HAW Hamburg)\n"
                 + "- Nils Weiss (HAW Hamburg)\n\n"
-                + "Building data was kindly provided by Ivan Dochev (HCU Hamburg).\n\n"
+                + "The data model as well as the actual data was provided by Ivan Dochev (HCU Hamburg).\n\n"
+                + "Additional contributers: Arjun Jamil (HAW Hamburg), Ev Köhler (HAW Hamburg), Hannes Seller (HCU Hamburg).\n\n"
+                + "Project lead: Wolfgang Renz (HAW Hamburg), Irene Peters (HCU Hamburg).\n\n"
                 + "All participants were part of the GEWISS Project (http://gewiss.haw-hamburg.de/) funded by the German Federal Ministry for Economic Affairs and Energy.\n\n"
                 + "Icon made by Freepik (www.freepik.com) from www.flaticon.com.");
 

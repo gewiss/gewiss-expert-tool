@@ -1,6 +1,5 @@
 package de.hawhh.gewiss.get.fx.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
@@ -9,29 +8,21 @@ import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
 import de.hawhh.gewiss.get.simulator.db.dao.SQLiteBuildingDAO;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.controlsfx.control.CheckTreeView;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import org.controlsfx.control.CheckTreeView;
 
 /**
  * Controller for the Modifier.fxml view.
@@ -74,11 +65,10 @@ public class ModifierController {
     private VBox modifierPane;
 
     private InputController inputController;
-    private SQLiteBuildingDAO buildingDAO;
 
     public void init(InputController parentController) {
         inputController = parentController;
-        buildingDAO = new SQLiteBuildingDAO();
+        SQLiteBuildingDAO buildingDAO = new SQLiteBuildingDAO();
 
         modifierName.focusedProperty().addListener((arg0, oldValue, newValue) -> {
             if (!newValue) { //when focus lost
@@ -303,27 +293,21 @@ public class ModifierController {
 
     private List<String> getSelectedQuarters() {
         List<String> quarters = new ArrayList<>();
-        locationCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty())).forEachOrdered((item) -> {
-            quarters.add(item.getValue());
-        });
+        locationCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty())).forEachOrdered((item) -> quarters.add(item.getValue()));
 
         return quarters;
     }
 
     private List<String> getSelectedResidentialBuildingTypes() {
         List<String> types = new ArrayList<>();
-        typeCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.RESIDENTIAL_BUILDINGS))).forEachOrdered((item) -> {
-            types.add(item.getValue());
-        });
+        typeCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.RESIDENTIAL_BUILDINGS))).forEachOrdered((item) -> types.add(item.getValue()));
 
         return types;
     }
 
     private List<String> getSelectedNonResidentialBuildingTypes() {
         List<String> types = new ArrayList<>();
-        typeCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.NON_RESIDENTIAL_BUILDINGS))).forEachOrdered((item) -> {
-            types.add(item.getValue());
-        });
+        typeCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.NON_RESIDENTIAL_BUILDINGS))).forEachOrdered((item) -> types.add(item.getValue()));
 
         return types;
     }
@@ -351,8 +335,6 @@ public class ModifierController {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
                 bufferedWriter.write(jsonString);
                 bufferedWriter.flush();
-            } catch (JsonProcessingException ex) {
-                Logger.getLogger(ModifierController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(ModifierController.class.getName()).log(Level.SEVERE, null, ex);
             }

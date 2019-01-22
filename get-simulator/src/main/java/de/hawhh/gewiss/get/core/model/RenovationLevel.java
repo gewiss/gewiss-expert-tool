@@ -6,5 +6,5 @@ package de.hawhh.gewiss.get.core.model;
  * @author Thomas Preisler
  */
 public enum RenovationLevel {
-    NO_RENOVATION, BASIC_RENOVATION, GOOD_RENOVATION;
+    NO_RENOVATION, BASIC_RENOVATION, GOOD_RENOVATION
 }

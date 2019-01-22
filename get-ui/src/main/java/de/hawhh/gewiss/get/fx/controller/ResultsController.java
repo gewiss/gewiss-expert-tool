@@ -2,12 +2,13 @@ package de.hawhh.gewiss.get.fx.controller;
 
 import de.hawhh.gewiss.get.simulator.db.dao.DistrictQuarterDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.SQLiteDistrictQuarterDAO;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TitledPane;
+
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * FXML Controller class for the Results.fxml
@@ -32,15 +33,11 @@ public class ResultsController {
     @FXML
     private TitledPane tpChartResults;
 
-    private MainController mainController;
-
     private List<String> quarters;
-    private DistrictQuarterDAO districtQuarterDAO;
 
     public void init(MainController mc) {
         LOGGER.info("Initializing ResultsController");
-        this.mainController = mc;
-        this.districtQuarterDAO = new SQLiteDistrictQuarterDAO();
+        DistrictQuarterDAO districtQuarterDAO = new SQLiteDistrictQuarterDAO();
 
         this.quarters = districtQuarterDAO.getQuarters();
 

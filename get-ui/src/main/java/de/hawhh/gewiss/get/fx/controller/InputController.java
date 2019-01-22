@@ -22,15 +22,6 @@ import de.hawhh.gewiss.get.simulator.scoring.BuildingAgeFactor;
 import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionFactor;
 import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionSquareMeterFactor;
 import de.hawhh.gewiss.get.simulator.scoring.ScoringMethod;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.Event;
@@ -44,11 +35,22 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * FXML Controller class for the Input.fxml.
  *
  * @author Thomas Preisler
  */
+@SuppressWarnings("ALL")
 public class InputController implements Observer {
 
     public static final String RESIDENTIAL_BUILDINGS = "Residential";

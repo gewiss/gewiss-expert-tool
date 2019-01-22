@@ -7,11 +7,7 @@ import com.esri.arcgisruntime.geometry.Polygon;
 import com.esri.arcgisruntime.geometry.SpatialReference;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
-import com.esri.arcgisruntime.mapping.view.Callout;
-import com.esri.arcgisruntime.mapping.view.Graphic;
-import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
-import com.esri.arcgisruntime.mapping.view.IdentifyGraphicsOverlayResult;
-import com.esri.arcgisruntime.mapping.view.MapView;
+import com.esri.arcgisruntime.mapping.view.*;
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,22 +19,6 @@ import de.hawhh.gewiss.get.core.output.BuildingInformation;
 import de.hawhh.gewiss.get.core.output.SimulationOutput;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.fx.SimulationResultHolder;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.lang.management.ManagementFactory;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -62,6 +42,17 @@ import org.opengis.referencing.operation.TransformException;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.LngLatGeoJSONWriter;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.lang.management.ManagementFactory;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for MapResults.fxml
@@ -113,7 +104,7 @@ public class MapResultsController {
                 // async loading task for displaying the buildings
                 Task displayTask = new Task() {
                     @Override
-                    protected Object call() throws Exception {
+                    protected Object call() {
                         showBuildings();
                         return null;
                     }
@@ -213,9 +204,8 @@ public class MapResultsController {
      */
     private SimpleFillSymbol createFillSymbol(int outlineColor, float outlineWidth, int fillColor, SimpleFillSymbol.Style fillStyle) {
         SimpleLineSymbol outlineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, outlineColor, outlineWidth);
-        SimpleFillSymbol fillSymbol = new SimpleFillSymbol(fillStyle, fillColor, outlineSymbol);
 
-        return fillSymbol;
+        return new SimpleFillSymbol(fillStyle, fillColor, outlineSymbol);
     }
 
     /**
@@ -228,8 +218,7 @@ public class MapResultsController {
             points.add(new Point(coordinate.x, coordinate.y));
         }
 
-        Polygon polygon = new Polygon(points);
-        return polygon;
+        return new Polygon(points);
     }
 
     /**

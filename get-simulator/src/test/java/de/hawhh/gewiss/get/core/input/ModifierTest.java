@@ -1,15 +1,15 @@
 package de.hawhh.gewiss.get.core.input;
 
-import de.hawhh.gewiss.get.core.input.Modifier;
 import com.google.common.collect.Range;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
-import java.util.Arrays;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 /**
  * Test class for {@link Modifier}s.
@@ -24,10 +24,9 @@ public class ModifierTest {
     /**
      * Test of checkConditions method, of class Modifier.
      *
-     * @throws java.lang.NoSuchMethodException
      */
     @Test
-    public void testCheckConditions() throws NoSuchMethodException {
+    public void testCheckConditions() {
         System.out.println("checkConditions");
         
         Building building = new Building();
@@ -40,9 +39,9 @@ public class ModifierTest {
         
         Modifier instance = new Modifier("Test", 2017, 2018, 2d);
         instance.setTargetQuarters(Arrays.asList("Altona", "Bahrenfeld"));
-        instance.setTargetRenovationLevels(Arrays.asList(RenovationLevel.BASIC_RENOVATION));
-        instance.setTargetBuildingsTypes(Arrays.asList("Test"));
-        instance.setTargetHeatingSystems(Arrays.asList(HeatingType.CONDENSING_BOILER));
+        instance.setTargetRenovationLevels(Collections.singletonList(RenovationLevel.BASIC_RENOVATION));
+        instance.setTargetBuildingsTypes(Collections.singletonList("Test"));
+        instance.setTargetHeatingSystems(Collections.singletonList(HeatingType.CONDENSING_BOILER));
         instance.setYearOfConstructionRange(Range.closed(1990, 2000));
         
         boolean result = instance.checkConditions(building);

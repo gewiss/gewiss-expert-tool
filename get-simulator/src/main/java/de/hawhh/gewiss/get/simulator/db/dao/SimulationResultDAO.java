@@ -3,26 +3,23 @@ package de.hawhh.gewiss.get.simulator.db.dao;
 import de.bytefish.pgbulkinsert.PgBulkInsert;
 import de.hawhh.gewiss.get.core.output.SimulationOutput;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.postgresql.PGConnection;
+
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.postgresql.PGConnection;
 
 /**
  * PostgresDAO for saving {@link SimulationResult}s and the according {@link SimulationOutput}s in the PostGIS DB.
- * 
+ *
  * @author Thomas Preisler
  */
 public class SimulationResultDAO {
 
     private final static Logger LOGGER = Logger.getLogger(SimulationResultDAO.class.getName());
-    
-    private Connection connection;
- 
+
+    private final Connection connection;
+
     public SimulationResultDAO(Connection connection) {
         this.connection = connection;
         try {
@@ -32,9 +29,15 @@ public class SimulationResultDAO {
         }
     }
 
+    /**
+     * Save the given {@link SimulationResult} and return the created ID (key).
+     *
+     * @param sr
+     * @return
+     */
     public Integer save(SimulationResult sr) {
         Integer key = null;
-        
+
         try {
             LOGGER.log(Level.INFO, "Saving given simulation result {0} to database", sr);
 
@@ -64,15 +67,15 @@ public class SimulationResultDAO {
 
         return key;
     }
-     
+
     /**
      * A special bulk inserting for PostgreSQL Databases, based on the Postgres COPY command. Way faster than using standard JDBC INSERT BATCH.
      */
     private class SimulationOutputBulkInserter extends PgBulkInsert<SimulationOutput> {
-        
-        public SimulationOutputBulkInserter(Integer simId) {
+
+        SimulationOutputBulkInserter(Integer simId) {
             super("public", "simulation_output");
-            
+
             mapInteger("sim_id", (SimulationOutput so) -> simId);
             mapString("building_id", SimulationOutput::getBuildingId);
             mapInteger("year", SimulationOutput::getYear);

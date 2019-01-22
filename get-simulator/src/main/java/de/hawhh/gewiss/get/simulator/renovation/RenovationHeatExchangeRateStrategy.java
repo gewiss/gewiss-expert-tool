@@ -6,6 +6,7 @@ import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,15 +60,12 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
             if (building.getRenovationLevel().equals(RenovationLevel.NO_RENOVATION)) {
                 // Perform a "normal" or passive house standard renovation depending on the passive house rate
                 if (pseudoRandomGenerator.nextDouble() * 100 <= passiveHouseRate) {
-                    building.setRenovationLevel(RenovationLevel.GOOD_RENOVATION);
+                    building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
                 } else {
-                    building.setRenovationLevel(RenovationLevel.BASIC_RENOVATION);
+                    building.renovate(RenovationLevel.BASIC_RENOVATION, currentYear);
                 }
-
-                building.setYearOfRenovation(currentYear);
             } else if (building.getRenovationLevel().equals(RenovationLevel.BASIC_RENOVATION)) {
-                building.setRenovationLevel(RenovationLevel.GOOD_RENOVATION);
-                building.setYearOfRenovation(currentYear);
+                building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
             }
             
             // renovation/exchange of heating system
@@ -78,7 +76,7 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
                    
                    for (Range<Double> classRange : classes.keySet()) {
                        if (classRange.contains(coinToss)) {
-                           building.setHeatingType(classes.get(classRange));
+                           building.exchangeHeatingSystem(classes.get(classRange));
                            //LOGGER.log(Level.INFO, "Changed heating systemn in building {0} from {1} to {2}", new Object[]{building.getAlkisID(), heatingType, building.getHeatingType()});
                        }
                    }
@@ -147,10 +145,7 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     }
 
     private void printHeatingExchangeClasses() {
-        this.heatingExchangeClasses.keySet().stream().map((originType) -> {
-            LOGGER.log(Level.INFO, "Heating Exchange Classes for: {0}", originType);
-            return originType;            
-        }).forEachOrdered((originType) -> {
+        this.heatingExchangeClasses.keySet().stream().peek((originType) -> LOGGER.log(Level.INFO, "Heating Exchange Classes for: {0}", originType)).forEachOrdered((originType) -> {
             this.heatingExchangeClasses.get(originType).keySet().forEach((range) -> {
                 HeatingType toType = this.heatingExchangeClasses.get(originType).get(range);
                 

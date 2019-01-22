@@ -3,7 +3,7 @@ package de.hawhh.gewiss.get.core.util;
 /**
  * Helper class for accessing enviroment variables.
  */
-public class Environment {
+class Environment {
 
     /**
      * Reads the environment variable for the given key and returns either the found value or the given default value.
@@ -26,7 +26,7 @@ public class Environment {
      * @param key the name of the given environment variable
      * @return
      */
-    public static String getFromEnv(String key) {
+    private static String getFromEnv(String key) {
         return System.getenv().get(key);
     }
 
@@ -36,12 +36,11 @@ public class Environment {
      * @param key the name of the given environment variable
      * @return
      */
-    public static Integer getIntFromEnv(String key) {
+    private static Integer getIntFromEnv(String key) {
         String value = System.getenv().get(key);
         if (value != null) {
             try {
-                Integer integer = Integer.parseInt(value);
-                return integer;
+                return Integer.parseInt(value);
             } catch (NumberFormatException e) {
                 return null;
             }
@@ -70,12 +69,11 @@ public class Environment {
      * @param key the name of the given environment variable
      * @return
      */
-    public static Long getLongFromEnv(String key) {
+    private static Long getLongFromEnv(String key) {
         String value = System.getenv().get(key);
         if (value != null) {
             try {
-                Long lon = Long.parseLong(value);
-                return lon;
+                return Long.parseLong(value);
             } catch (NumberFormatException e) {
                 return null;
             }

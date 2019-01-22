@@ -3,20 +3,20 @@ package de.hawhh.gewiss.get.core.util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
 
 public class MultimapCollector<T, K, V> implements Collector<T, Multimap<K, V>, Multimap<K, V>> {
 
     private final Function<T, K> keyGetter;
     private final Function<T, V> valueGetter;
 
-    public MultimapCollector(Function<T, K> keyGetter, Function<T, V> valueGetter) {
+    private MultimapCollector(Function<T, K> keyGetter, Function<T, V> valueGetter) {
         this.keyGetter = keyGetter;
         this.valueGetter = valueGetter;
     }

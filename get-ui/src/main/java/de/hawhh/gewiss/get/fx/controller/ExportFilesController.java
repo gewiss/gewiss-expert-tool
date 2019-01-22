@@ -4,12 +4,6 @@ import de.hawhh.gewiss.get.core.output.BuildingInformation;
 import de.hawhh.gewiss.get.core.output.SimulationOutput;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.fx.SimulationResultHolder;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,6 +16,13 @@ import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for ExportFiles.fxml
@@ -39,14 +40,12 @@ public class ExportFilesController {
     @FXML
     private ProgressBar exportProgess;
 
-    private ToggleGroup toggleGroup;
-
     private final static Logger LOGGER = Logger.getLogger(ExportFilesController.class.getName());
 
     public void init() {
         LOGGER.info("Initializing ExportFilesController");
 
-        this.toggleGroup = new ToggleGroup();
+        ToggleGroup toggleGroup = new ToggleGroup();
         excelRadio.setToggleGroup(toggleGroup);
         excelRadio.setSelected(true);
     }
@@ -64,14 +63,12 @@ public class ExportFilesController {
 
                 Task<Boolean> exportTask = new Task<Boolean>() {
                     @Override
-                    protected Boolean call() throws Exception {
+                    protected Boolean call() {
                         return exportToExcel(result, file);
                     }
 
                 };
-                exportTask.setOnSucceeded(event -> {
-                    exportProgess.setProgress(1d);
-                });
+                exportTask.setOnSucceeded(event -> exportProgess.setProgress(1d));
 
                 new Thread(exportTask).start();
                 exportProgess.setProgress(-1d);

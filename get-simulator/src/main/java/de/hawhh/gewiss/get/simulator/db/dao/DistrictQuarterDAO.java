@@ -15,14 +15,14 @@ public interface DistrictQuarterDAO {
      * 
      * @return the List of districts as String or <code>null</code> in case of an exception
      */
-    public List<String> getDistricts();
+    List<String> getDistricts();
 
     /**
      * Return a List of all distinct quarters in the city.
      *
      * @return the List of quarters as String or <code>null</code> in case of an exception
      */
-    public List<String> getQuarters();
+    List<String> getQuarters();
 
     /**
      * Return a List of all distinct quarters for the given district.
@@ -30,6 +30,6 @@ public interface DistrictQuarterDAO {
      * @param district the name of the given district
      * @return the List of quarters as String or <code>null</code> in case of an exception
      */
-    public List<String> getQuarters(String district);
+    List<String> getQuarters(String district);
     
 }

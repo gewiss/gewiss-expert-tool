@@ -3,6 +3,7 @@ package de.hawhh.gewiss.get.simulator.renovation;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
+
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -28,7 +29,7 @@ public class RenovationRateStrategy implements IRenovationStrategy {
      * @param renovationRate
      * @param basicRenovationChance
      */
-    public RenovationRateStrategy(Double renovationRate, Double basicRenovationChance) {
+    private RenovationRateStrategy(Double renovationRate, Double basicRenovationChance) {
         this.renovationRate = renovationRate;
         this.basicRenovationChance = basicRenovationChance;
 
@@ -48,14 +49,12 @@ public class RenovationRateStrategy implements IRenovationStrategy {
             if (building.getRenovationLevel().equals(RenovationLevel.NO_RENOVATION)) {
                 // Perform a basic or a good renovation depending on the basic renovation chance
                 if (pseudoRandomGenerator.nextDouble() <= basicRenovationChance) {
-                    building.setRenovationLevel(RenovationLevel.BASIC_RENOVATION);
+                    building.renovate(RenovationLevel.BASIC_RENOVATION, currentYear);
                 } else {
-                    building.setRenovationLevel(RenovationLevel.GOOD_RENOVATION);
+                    building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
                 }
-                building.setYearOfRenovation(currentYear);
             } else if (building.getRenovationLevel().equals(RenovationLevel.BASIC_RENOVATION)) {
-                building.setRenovationLevel(RenovationLevel.GOOD_RENOVATION);
-                building.setYearOfRenovation(currentYear);
+                building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
             }
         });
 

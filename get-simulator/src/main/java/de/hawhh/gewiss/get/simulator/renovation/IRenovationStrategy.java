@@ -1,19 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.hawhh.gewiss.get.simulator.renovation;
 
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
+
 import java.util.List;
 import java.util.Random;
 
 /**
+ * Interface for renovation strategies.
  *
- * @author Thomas
+ * @author Thomas Preisler
  */
 public interface IRenovationStrategy {
-    
-    public void performRenovation(List<ScoredBuilding> scoredBuildings, Integer currentYear, Random pseudoRandomGenerator);    
+
+    /**
+     * Perform the renovation strategy for the given list of {@link ScoredBuilding}s
+     *
+     * @param scoredBuildings
+     * @param currentYear           the current year of the simulation
+     * @param pseudoRandomGenerator the pseudo random generator used for the simulation
+     */
+    void performRenovation(List<ScoredBuilding> scoredBuildings, Integer currentYear, Random pseudoRandomGenerator);
 }

@@ -2,7 +2,6 @@ package de.hawhh.gewiss.get.fx.controller;
 
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
 import de.hawhh.gewiss.get.core.model.HeatingType;
-import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,6 +13,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 import org.controlsfx.control.CheckComboBox;
+
+import java.util.List;
 
 /**
  * Controller for the InitialParameter.fxml view.
@@ -73,7 +74,7 @@ public class InitialParametersController {
 
         lowTempBoilerRate.setCellValueFactory(new PropertyValueFactory<>("lowTempBoilerRate"));
         lowTempBoilerRate.setEditable(true);
-        lowTempBoilerRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        lowTempBoilerRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         lowTempBoilerRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -85,7 +86,7 @@ public class InitialParametersController {
 
         districtHeatRate.setCellValueFactory(new PropertyValueFactory<>("districtHeatRate"));
         districtHeatRate.setEditable(true);
-        districtHeatRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        districtHeatRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         districtHeatRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -97,7 +98,7 @@ public class InitialParametersController {
 
         condensingBoilerRate.setCellValueFactory(new PropertyValueFactory<>("condensingBoilerRate"));
         condensingBoilerRate.setEditable(true);
-        condensingBoilerRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        condensingBoilerRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         condensingBoilerRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -109,7 +110,7 @@ public class InitialParametersController {
 
         condBoilerSolarRate.setCellValueFactory(new PropertyValueFactory<>("condBoilerSolarRate"));
         condBoilerSolarRate.setEditable(true);
-        condBoilerSolarRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        condBoilerSolarRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         condBoilerSolarRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -121,7 +122,7 @@ public class InitialParametersController {
 
         pelletsRate.setCellValueFactory(new PropertyValueFactory<>("pelletsRate"));
         pelletsRate.setEditable(true);
-        pelletsRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        pelletsRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         pelletsRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -133,7 +134,7 @@ public class InitialParametersController {
 
         heatPumpHRRate.setCellValueFactory(new PropertyValueFactory<>("heatPumpHRRate"));
         heatPumpHRRate.setEditable(true);
-        heatPumpHRRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        heatPumpHRRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         heatPumpHRRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -145,7 +146,7 @@ public class InitialParametersController {
 
         pelletsSolarHRRate.setCellValueFactory(new PropertyValueFactory<>("pelletsSolarHRRate"));
         pelletsSolarHRRate.setEditable(true);
-        pelletsSolarHRRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        pelletsSolarHRRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         pelletsSolarHRRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -157,7 +158,7 @@ public class InitialParametersController {
 
         districtHeatHRRate.setCellValueFactory(new PropertyValueFactory<>("districtHeatHRRate"));
         districtHeatHRRate.setEditable(true);
-        districtHeatHRRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        districtHeatHRRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         districtHeatHRRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();
@@ -169,7 +170,7 @@ public class InitialParametersController {
 
         condBoilerSolarHRRate.setCellValueFactory(new PropertyValueFactory<>("condBoilerSolarHRRate"));
         condBoilerSolarHRRate.setEditable(true);
-        condBoilerSolarHRRate.setCellFactory(TextFieldTableCell.<HeatingSystemExchangeRate, Double>forTableColumn(new DoubleStringConverter()));
+        condBoilerSolarHRRate.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         condBoilerSolarHRRate.setOnEditCommit((TableColumn.CellEditEvent<HeatingSystemExchangeRate, Double> event) -> {
             TablePosition<HeatingSystemExchangeRate, Double> pos = event.getTablePosition();
             Double newValue = event.getNewValue();

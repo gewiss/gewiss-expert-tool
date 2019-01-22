@@ -5,6 +5,7 @@ import com.google.common.collect.Range;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
+
 import java.util.List;
 
 /**
@@ -82,9 +83,7 @@ public class Modifier {
         }
 
         if (yearOfConstructionRange != null) {
-            if (!yearOfConstructionRange.contains(building.getYearOfConstruction())) {
-                return false;
-            }
+            return yearOfConstructionRange.contains(building.getYearOfConstruction());
         }
 
         return true;
@@ -179,9 +178,7 @@ public class Modifier {
         }
         
         if (maxDistrictHeatingDistance != null) {
-            if (maxDistrictHeatingDistance < 0) {
-                return false;
-            }
+            return maxDistrictHeatingDistance >= 0;
         }
         
         return true;

@@ -1,10 +1,6 @@
 package de.hawhh.gewiss.get.fx.controller;
 
 import com.sun.management.OperatingSystemMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.ModifiableObservableListBase;
 import javafx.collections.ObservableList;
@@ -16,6 +12,11 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
+
+import java.lang.management.ManagementFactory;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * FXML Controller for the Progress.fxml
@@ -48,7 +49,6 @@ public class ProgressController {
     private ObservableList<XYChart.Data<Number, Number>> memoryUsedData;
 
     private NumberAxis cpuXAxis;
-    private NumberAxis cpuYAxis;
 
     private NumberAxis memoryXAxis;
 
@@ -78,7 +78,7 @@ public class ProgressController {
         cpuXAxis.setUpperBound(NO_MEASUREMENTS - 1);
         cpuXAxis.setAutoRanging(false);
 
-        cpuYAxis = (NumberAxis) cpuUsageChart.getYAxis();
+        NumberAxis cpuYAxis = (NumberAxis) cpuUsageChart.getYAxis();
         cpuYAxis.setLowerBound(0);
         cpuYAxis.setUpperBound(100);
         cpuYAxis.setAutoRanging(false);
@@ -120,7 +120,7 @@ public class ProgressController {
     private class MonitorTask extends Task<Void> {
 
         @Override
-        protected Void call() throws Exception {
+        protected Void call() {
             int cycle = 0;
 
             OperatingSystemMXBean bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();

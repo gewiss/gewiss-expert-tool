@@ -1,8 +1,9 @@
 package de.hawhh.gewiss.get.simulator.db.dao;
 
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * Test class for {@link SQLiteDistrictQuarterDAO}.
@@ -21,7 +22,7 @@ public class SQLiteDistrictQuarterDAOTest {
         List<String> result = instance.getQuarters();
 
         Assert.assertNotNull(result);
-        Assert.assertTrue(result.size() == 104);
+        Assert.assertEquals(104, result.size());
     }
 
     /**
@@ -35,7 +36,7 @@ public class SQLiteDistrictQuarterDAOTest {
         List<String> result = instance.getQuarters(district);
         
         Assert.assertNotNull(result);
-        Assert.assertTrue(result.size() == 14);
+        Assert.assertEquals(14, result.size());
     }
 
     /**
@@ -48,6 +49,6 @@ public class SQLiteDistrictQuarterDAOTest {
         List<String> result = instance.getDistricts();
         
         Assert.assertNotNull(result);
-        Assert.assertTrue(result.size() == 7);
+        Assert.assertEquals(7, result.size());
     }
 }

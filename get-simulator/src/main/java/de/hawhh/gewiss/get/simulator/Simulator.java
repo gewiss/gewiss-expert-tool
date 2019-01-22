@@ -6,21 +6,18 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import de.hawhh.gewiss.get.core.calc.EnergyCalculator;
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
 import de.hawhh.gewiss.get.core.input.InputValidationException;
 import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.input.SimulationParameter;
 import de.hawhh.gewiss.get.core.model.Building;
-import de.hawhh.gewiss.get.core.model.EnergySource;
-import de.hawhh.gewiss.get.core.model.EnergySource.Type;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.output.BuildingInformation;
 import de.hawhh.gewiss.get.core.output.SimulationOutput;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.simulator.db.dao.BuildingDAO;
-import de.hawhh.gewiss.get.simulator.db.dao.EnergySourceDAO;
 import de.hawhh.gewiss.get.simulator.db.dao.SQLiteBuildingDAO;
-import de.hawhh.gewiss.get.simulator.db.dao.SQLiteEnergySourceDAO;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
 import de.hawhh.gewiss.get.simulator.renovation.IRenovationStrategy;
 import de.hawhh.gewiss.get.simulator.renovation.RenovationHeatExchangeRateStrategy;
@@ -28,16 +25,9 @@ import de.hawhh.gewiss.get.simulator.scoring.BuildingAgeFactor;
 import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionFactor;
 import de.hawhh.gewiss.get.simulator.scoring.CO2EmissionSquareMeterFactor;
 import de.hawhh.gewiss.get.simulator.scoring.ScoringMethod;
-import java.io.IOException;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -52,12 +42,12 @@ public class Simulator extends Observable {
     private final static Logger LOGGER = Logger.getLogger(Simulator.class.getName());
 
     private final BuildingDAO buildingDAO;
-    private final EnergySourceDAO energySourceDAO;
+    private final EnergyCalculator energyCalculator;
     private final Random randomGenerator;
 
     public Simulator() {
         this.buildingDAO = new SQLiteBuildingDAO();
-        this.energySourceDAO = new SQLiteEnergySourceDAO();
+        this.energyCalculator = EnergyCalculator.getInstance();
         this.randomGenerator = new Random();
     }
 
@@ -74,6 +64,8 @@ public class Simulator extends Observable {
      * @throws de.hawhh.gewiss.get.core.input.InputValidationException
      */
     public SimulationResult simulate(SimulationParameter parameter, List<ScoringMethod> scoringMethods, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
+        long startTime = System.currentTimeMillis();
+
         if (rgSeed != null) {
             // set the seed for the random generator
             this.randomGenerator.setSeed(rgSeed);
@@ -90,11 +82,6 @@ public class Simulator extends Observable {
         
         // Limit the number of buildings, only for debug purposes!
         //buildings = buildings.subList(0, 20);
-
-        // Fetch the energy sources from the DB and match them to heating types
-        Map<EnergySource.Type, EnergySource> energySources = fetchEnergySources();
-        //System.out.println("fetching is DONE!");
-        Map<HeatingType, EnergySource> heatingToFuelMap = mapEnergySourcesToHeatingTypes(energySources);
 
         SimulationResult result = new SimulationResult();
         result.setName(parameter.getName());
@@ -122,7 +109,7 @@ public class Simulator extends Observable {
                     ScoredBuilding scoredBuilding = new ScoredBuilding(building);
 
                     // Calc and store the scores for all scoring methods
-                    scoringMethods.stream().forEach(method -> {
+                    scoringMethods.forEach(method -> {
                         Double score = method.calcBaseScore(building, simYear);
                         scoredBuilding.getScores().put(method, score);
                     });
@@ -159,7 +146,7 @@ public class Simulator extends Observable {
 
                 // Sort the List of scored buildings in a descending (reverse) order of scores
                 LOGGER.info("Sorting building (desc) according to scoring values");
-                Collections.sort(scoredBuildings, (ScoredBuilding o1, ScoredBuilding o2) -> -o1.getCombinedScore().compareTo(o2.getCombinedScore()));
+                scoredBuildings.sort((ScoredBuilding o1, ScoredBuilding o2) -> -o1.getCombinedScore().compareTo(o2.getCombinedScore()));
 
                 // Apply renovation strategy
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
@@ -168,16 +155,10 @@ public class Simulator extends Observable {
             List<SimulationOutput> outputs = buildings.stream().parallel().map(building -> {
                 SimulationOutput output = new SimulationOutput();
 
-                Double heatDemand = building.calcHeatDemand();
-
-                // Calc co2 emmission for buildings
-                Double co2Emission = building.calcCo2Emission(heatDemand, heatingToFuelMap);
-//                System.out.println(co2Emission.toString());
+                Double heatDemand = energyCalculator.calcHeatDemand(building);
+                Double co2Emission = energyCalculator.calcCO2Emission(building);
 
                 output.setBuildingId(building.getAlkisID());
-//                output.setQuarter(building.getQuarter());
-//                output.setClusterId(building.getClusterID());
-//                output.setGeometry(building.getGeometry());
                 output.setHeatDemand(heatDemand);
                 output.setHeatDemandM2(heatDemand / (building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace()));
                 output.setRenovationLevel(building.getRenovationLevel());
@@ -185,9 +166,8 @@ public class Simulator extends Observable {
                 output.setYear(simYear);
                 output.setCo2Emission(co2Emission);
 
-                // TODO: Fill with meaningful values
                 output.setHeatingType(building.getHeatingType());
-                output.setRenovationCost(0d);
+                output.setRenovationCost(building.getAccumulatedRenovationCosts());
 
                 return output;
             }).collect(Collectors.toList());
@@ -204,6 +184,9 @@ public class Simulator extends Observable {
         Map<String, BuildingInformation> resultBuildings = buildings.stream().collect(Collectors.toMap(Building::getAlkisID, building -> BuildingInformation.create(building.getAlkisID(), building.getClusterID(), building.getQuarter(), building.getGeometry())));
         result.setBuildings(resultBuildings);
 
+        long endTime = System.currentTimeMillis();
+        result.setRunTime(endTime - startTime);
+
         return result;
     }
 
@@ -212,63 +195,12 @@ public class Simulator extends Observable {
      *
      * @return List of buildings
      */
-    private List<Building> fetchBuildings() {
+    List<Building> fetchBuildings() {
         return buildingDAO.findAll();
     }
 
-    /**
-     * Fetch all the energy sources from the database and return them as a map.
-     *
-     * @return List of buildings
-     */
-    private Map<EnergySource.Type, EnergySource> fetchEnergySources() {
-        return energySourceDAO.findAll();
-    }
-
-    /**
-     * Map the EnergySources to the corresponding HeatingTypes.
-     *
-     * @param sources the Map of EnergySources.
-     *
-     * @return map with heating types as key and energy source as value.
-     */
-    private Map<HeatingType, EnergySource> mapEnergySourcesToHeatingTypes(Map<EnergySource.Type, EnergySource> sources) {
-        Map<HeatingType, EnergySource> heatingTypeToSourceMap = new HashMap<>();
-
-        for (HeatingType type : HeatingType.values()) {
-
-            switch (type) {
-                case LOW_TEMPERATURE_BOILER:
-                case CONDENSING_BOILER:
-                case CONDENSING_BOILER_SOLAR:
-                case CONDENSING_BOILER_SOLAR_HEAT_RECOVERY:
-                    heatingTypeToSourceMap.put(type, sources.get(Type.NATURAL_GAS));
-                    break;
-
-                case DISTRICT_HEAT:
-                case DISTRICT_HEAT_HEAT_RECOVERY:
-                    heatingTypeToSourceMap.put(type, sources.get(Type.DISTRICT_HEAT));
-                    break;
-
-                case PELLETS:
-                case PELLETS_SOLAR_HEAT_RECOVERY:
-                    heatingTypeToSourceMap.put(type, sources.get(Type.PELLETS));
-                    break;
-
-                case HEAT_PUMP_HEAT_RECOVERY:
-                    heatingTypeToSourceMap.put(type, sources.get(Type.ELECTRICITY));
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        return heatingTypeToSourceMap;
-    }
-
-    public static void main(String[] args) throws InputValidationException, IOException {
-        Integer simStop = 2050;
+    public static void main(String[] args) throws InputValidationException {
+        Integer simStop = 3000;
 
         String name = "ConsoleRun-" + LocalDateTime.now();
 
@@ -289,22 +221,19 @@ public class Simulator extends Observable {
         scoringMethods.add(new BuildingAgeFactor());
         scoringMethods.add(new CO2EmissionFactor());
         scoringMethods.add(new CO2EmissionSquareMeterFactor());
-        
-        List<HeatingSystemExchangeRate> rates = new ArrayList<>();
+
         HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
         HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        rates.addAll(Arrays.asList(rate1, rate2));
+        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2));
 
         IRenovationStrategy renovationStrategy = new RenovationHeatExchangeRateStrategy(2.0, 0.0, rates);
 
-        long startTime = System.currentTimeMillis();
         Simulator simulator = new Simulator();
         SimulationResult result = simulator.simulate(parameter, scoringMethods, renovationStrategy, (long) 821985);
-        long endTime = System.currentTimeMillis();
 
-        System.out.println("Simulated scenario " + result.getName() + " in " + (endTime - startTime) + " ms");
+        System.out.println("Simulated scenario " + result.getName() + " in " + result.getRunTime() + " ms");
         result.printHeatDemand();
         result.printRenovationLevelDemand();
     }
@@ -314,8 +243,8 @@ public class Simulator extends Observable {
      *
      * @param scoredBuildings
      */
-    private void normalizeScores(List<ScoredBuilding> scoredBuildings, List<ScoringMethod> scoringMethods) {
-        scoringMethods.stream().forEach(method -> {
+    void normalizeScores(List<ScoredBuilding> scoredBuildings, List<ScoringMethod> scoringMethods) {
+        scoringMethods.forEach(method -> {
             Double min = scoredBuildings.parallelStream().mapToDouble(sb -> sb.getScores().get(method)).min().getAsDouble();
             Double max = scoredBuildings.parallelStream().mapToDouble(sb -> sb.getScores().get(method)).max().getAsDouble();
 
@@ -333,7 +262,7 @@ public class Simulator extends Observable {
      *
      * @param scoredBuildings
      */
-    private void combineScores(List<ScoredBuilding> scoredBuildings) {
+    void combineScores(List<ScoredBuilding> scoredBuildings) {
         scoredBuildings.parallelStream().forEach(sb -> {
             Double value = (1 / ((double) sb.getScores().size())) * (sb.getScores().values().stream().mapToDouble(Double::doubleValue).sum());
             sb.setCombinedScore(value);

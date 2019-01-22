@@ -2,16 +2,6 @@ package de.hawhh.gewiss.get.fx.controller;
 
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.fx.SimulationResultHolder;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
@@ -25,6 +15,17 @@ import javafx.stage.Stage;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.javatuples.Triplet;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for ChartResults.fxml.
@@ -42,8 +43,6 @@ public class ChartResultsController {
 
     private final static String LOCATION_ALL = "---ALL---";
 
-    private ResultsController parentController;
-
     @FXML
     private ComboBox<String> modeBox;
     @FXML
@@ -53,23 +52,15 @@ public class ChartResultsController {
     @FXML
     private BorderPane chartResultsPane;
 
-    private NumberAxis xAxis;
-    private NumberAxis yAxis;
-
     public void init(ResultsController parentController) {
         LOGGER.info("Initializing ChartResultsController");
-        this.parentController = parentController;
 
-        modeBox.getItems().addAll(CO2_EMISSION_MODE, HEAT_DEMAND_MODE, RENOVATION_LEVEL_MODE);
+        modeBox.getItems().addAll(CO2_EMISSION_MODE, HEAT_DEMAND_MODE, RENOVATION_LEVEL_MODE, RENOVATION_COST_MODE);
         locationBox.getItems().add(LOCATION_ALL);
-        locationBox.getItems().addAll(this.parentController.getQuarters());
+        locationBox.getItems().addAll(parentController.getQuarters());
 
-        modeBox.setOnAction(event -> {
-            displayResults();
-        });
-        locationBox.setOnAction(event -> {
-            displayResults();
-        });
+        modeBox.setOnAction(event -> displayResults());
+        locationBox.setOnAction(event -> displayResults());
     }
 
     @FXML
@@ -85,6 +76,8 @@ public class ChartResultsController {
 
             // HEAT_DEMAND_MODE
             if (modeBox != null && modeBox.getValue() != null) {
+                NumberAxis yAxis;
+                NumberAxis xAxis;
                 if (modeBox.getValue().equals(HEAT_DEMAND_MODE)) {
                     resultChart.getData().clear();
 
@@ -105,7 +98,7 @@ public class ChartResultsController {
                     heatDemandSeries.setName("Overall yearly heat demand");
 
                     Map<Integer, Double> heatDemands = result.getYearlyHeatDemand(location);
-                    heatDemands.keySet().stream().forEach(year -> {
+                    heatDemands.keySet().forEach(year -> {
                         Double heatDemand = heatDemands.get(year);
                         XYChart.Data data = new XYChart.Data(year, heatDemand);
                         heatDemandSeries.getData().add(data);
@@ -120,11 +113,9 @@ public class ChartResultsController {
 
                     resultChart.getData().add(heatDemandSeries);
 
-                    heatDemandSeries.getData().stream().forEach(date -> {
-                        Tooltip.install(date.getNode(), new Tooltip(
-                                "year: " + "\t \t" + date.getXValue().toString() + "\n" + "heat demand: " + "\t" + date.getYValue().toString())
-                        );
-                    });
+                    heatDemandSeries.getData().forEach(date -> Tooltip.install(date.getNode(), new Tooltip(
+                            "year: " + "\t \t" + date.getXValue().toString() + "\n" + "heat demand: " + "\t" + date.getYValue().toString())
+                    ));
 
                 } // RENOVATION_LEVEL_MODE
                 else if (modeBox.getValue().equals(RENOVATION_LEVEL_MODE)) {
@@ -179,23 +170,17 @@ public class ChartResultsController {
                     resultChart.getData().add(basicRenovationLevelSeries);
                     resultChart.getData().add(goodRenovationLevelSeries);
 
-                    noRenovationLevelSeries.getData().stream().forEach(date -> {
-                        Tooltip.install(date.getNode(), new Tooltip(
-                                "year:" + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
-                        );
-                    });
+                    noRenovationLevelSeries.getData().forEach(date -> Tooltip.install(date.getNode(), new Tooltip(
+                            "year:" + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
+                    ));
 
-                    basicRenovationLevelSeries.getData().stream().forEach(date -> {
-                        Tooltip.install(date.getNode(), new Tooltip(
-                                "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
-                        );
-                    });
+                    basicRenovationLevelSeries.getData().forEach(date -> Tooltip.install(date.getNode(), new Tooltip(
+                            "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
+                    ));
 
-                    goodRenovationLevelSeries.getData().stream().forEach(date -> {
-                        Tooltip.install(date.getNode(), new Tooltip(
-                                "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
-                        );
-                    });
+                    goodRenovationLevelSeries.getData().forEach(date -> Tooltip.install(date.getNode(), new Tooltip(
+                            "year: " + "\t \t" + date.getXValue().toString() + "\n" + "buildings: " + "\t" + date.getYValue().toString())
+                    ));
 
                     // RENOVATION_COST_MODE
                 } else if (modeBox.getValue().equals(RENOVATION_COST_MODE)) {
@@ -234,11 +219,9 @@ public class ChartResultsController {
 
                     resultChart.getData().add(renovationCostSeries);
 
-                    renovationCostSeries.getData().stream().forEach(date -> {
-                        Tooltip.install(date.getNode(), new Tooltip(
-                                "year: " + "\t" + date.getXValue().toString() + "\n" + "costs: " + "\t" + date.getYValue().toString())
-                        );
-                    });
+                    renovationCostSeries.getData().forEach(date -> Tooltip.install(date.getNode(), new Tooltip(
+                            "year: " + "\t" + date.getXValue().toString() + "\n" + "costs: " + "\t" + date.getYValue().toString())
+                    ));
                     // CO2_EMISSION_MODE
                 } else if (modeBox.getValue().equals(CO2_EMISSION_MODE)) {
 
@@ -276,11 +259,9 @@ public class ChartResultsController {
 
                     resultChart.getData().add(co2EmissionSeries);
 
-                    co2EmissionSeries.getData().stream().forEach(date -> {
-                        Tooltip.install(date.getNode(), new Tooltip(
-                                "year: " + "\t \t \t" + date.getXValue().toString() + "\n" + "CO2 emissions: " + "\t" + String.format("%.2f", date.getYValue()))
-                        );
-                    });
+                    co2EmissionSeries.getData().forEach(date -> Tooltip.install(date.getNode(), new Tooltip(
+                            "year: " + "\t \t \t" + date.getXValue().toString() + "\n" + "CO2 emissions: " + "\t" + String.format("%.2f", date.getYValue()))
+                    ));
                 }
             }
         }
@@ -302,9 +283,7 @@ public class ChartResultsController {
                 // Get the headers
                 List<String> headers = new ArrayList<>();
                 headers.add("Year");
-                dataSeries.forEach(series -> {
-                    headers.add(series.getName());
-                });
+                dataSeries.forEach(series -> headers.add(series.getName()));
 
                 writer = new BufferedWriter(new FileWriter(file));
                 CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(headers.stream().toArray(String[]::new)));

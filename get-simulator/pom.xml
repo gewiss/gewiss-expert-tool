@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.hawhh.gewiss</groupId>
     <artifactId>get-simulator</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
     
     <name>GET-Simulator</name>
@@ -66,8 +66,9 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.18</version>
-            <type>jar</type>
+            <version>1.18.4</version>
+            <scope>provided</scope>
+            <!--<type>jar</type>-->
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -164,5 +165,17 @@
             <artifactId>javatuples</artifactId>
             <version>1.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.2</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>1.7</version>
+        </dependency>
+        -->
     </dependencies>
 </project>

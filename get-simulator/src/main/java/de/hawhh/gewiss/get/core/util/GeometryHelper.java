@@ -47,13 +47,12 @@ public class GeometryHelper {
      * @return the converted {@link Geometry}
      * @throws ParseException if the WKT representation couldn't been parsed
      */
-    public static Geometry convertToJTSGeometry(PGgeometry pgGeom) throws ParseException {
+    private static Geometry convertToJTSGeometry(PGgeometry pgGeom) throws ParseException {
         StringBuffer sb = new StringBuffer();
         pgGeom.getGeometry().outerWKT(sb);
         WKTReader wktReader = new WKTReader();
-        Geometry geometry = wktReader.read(sb.toString());
 
-        return geometry;
+        return wktReader.read(sb.toString());
     }
 
     /**
@@ -62,7 +61,7 @@ public class GeometryHelper {
      * @param geom the given {@link Geometry}
      * @return the converted {@link Geometry}
      */
-    public static Geometry convertMultiPolygonToPolygon(Geometry geom) {
+    private static Geometry convertMultiPolygonToPolygon(Geometry geom) {
         if (geom instanceof MultiPolygon) {
             MultiPolygon mp = (MultiPolygon) geom;
             geom = mp.getGeometryN(0);

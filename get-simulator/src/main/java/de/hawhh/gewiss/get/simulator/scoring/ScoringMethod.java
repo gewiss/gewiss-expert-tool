@@ -18,5 +18,5 @@ public interface ScoringMethod {
      * @param simYear the current year of the simulation
      * @return the calculated building base score
      */
-    public Double calcBaseScore(Building building, Integer simYear);
+    Double calcBaseScore(Building building, Integer simYear);
 }

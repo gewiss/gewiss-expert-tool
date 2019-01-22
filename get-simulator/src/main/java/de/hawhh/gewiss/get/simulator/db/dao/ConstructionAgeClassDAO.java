@@ -1,6 +1,7 @@
 package de.hawhh.gewiss.get.simulator.db.dao;
 
 import de.hawhh.gewiss.get.core.model.ConstructionAgeClass;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author Thomas Preisler
  */
-public class ConstructionAgeClassDAO extends SQLiteDAO {
+class ConstructionAgeClassDAO extends SQLiteDAO {
 
     private final static Logger LOGGER = Logger.getLogger(ConstructionAgeClassDAO.class.getName());
 

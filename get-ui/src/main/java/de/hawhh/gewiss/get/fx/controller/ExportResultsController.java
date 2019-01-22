@@ -4,18 +4,15 @@ import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.fx.SimulationResultHolder;
 import de.hawhh.gewiss.get.simulator.db.dao.PostgresConnection;
 import de.hawhh.gewiss.get.simulator.db.dao.SimulationResultDAO;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.concurrent.Task;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 
 /**
  * Controller for ExportResults.fxml
@@ -102,11 +99,10 @@ public class ExportResultsController {
 
             Task<Integer> exportTask = new Task<Integer>() {
                 @Override
-                protected Integer call() throws Exception {
+                protected Integer call() {
                     SimulationResultDAO dao = new SimulationResultDAO(connection);
-                    Integer id = dao.save(result);
 
-                    return id;
+                    return dao.save(result);
                 }
             };
             exportTask.setOnSucceeded(event -> {

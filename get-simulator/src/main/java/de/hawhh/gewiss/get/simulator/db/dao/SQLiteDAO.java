@@ -7,11 +7,11 @@ import java.sql.Connection;
  * 
  * @author Thomas Preisler
  */
-public abstract class SQLiteDAO {
+abstract class SQLiteDAO {
     
-    protected final Connection connection;
+    final Connection connection;
     
-    public SQLiteDAO() {
+    SQLiteDAO() {
         connection = SQLiteConnection.getConnection();
     }
 }

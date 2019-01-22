@@ -1,7 +1,7 @@
 package de.hawhh.gewiss.get.core.model;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.Map;
+import de.hawhh.gewiss.get.core.calc.EnergyCalculator;
 import lombok.Data;
 
 /**
@@ -27,56 +27,35 @@ public class Building {
     private String property; // Besitz
     private Boolean monument; // Denkmal
     private ConstructionAgeClass constructionAgeClass; // Baualtersklasse
-    private RenovationCost residentialRenovationCost;
-    private RenovationCost nonResidentialRenovationCost;
-    private HeatDemand residentialHeatDemand;
-    private HeatDemand nonResidentialHeatDemand;
     private RenovationLevel renovationLevel;
     private String clusterID;
     private String heatingTypeString;
     private HeatingType heatingType;
     private Integer districtHeatingOutletDistance;
-    
+    private Double accumulatedRenovationCosts = 0d;
+
     public Building() {
         this.renovationLevel = RenovationLevel.NO_RENOVATION;
+        //this.energyCalculator = new EnergyCalculator();
     }
 
     /**
-     * Calculates the heat demand for this building based on it specific heating and warm water demand (IWU for residential and ecofys for non-residential buildings) by
-     * multiplying it with the used floor space. For residential and non-residential building as well as buildings that are used in both ways.
-     *
-     * @return the calculated heat demand
-     */
-    public Double calcHeatDemand() {
-        Double residentialDemand = 0d, nonResidentialDemand = 0d;
-
-        if (residentialHeatDemand != null) {
-            residentialDemand = (residentialHeatDemand.getHeatingDemand(renovationLevel) * residentialFloorSpace) + (residentialHeatDemand.getWarmWaterDemand(renovationLevel) * residentialFloorSpace);
-        }
-        if (nonResidentialHeatDemand != null) {
-            nonResidentialDemand = (nonResidentialHeatDemand.getHeatingDemand(renovationLevel) * nonResidentialFloorSpace) + (nonResidentialHeatDemand.getWarmWaterDemand(renovationLevel) * nonResidentialFloorSpace);
-        }
-
-        return residentialDemand + nonResidentialDemand;
-    }
-
-    /**
-     * Calculates the co2 emissions for this building based on it's heat demand
-     * @param heatDemand
-     * @param heatingToFuelMap
-     * @return the calculated co2 emissions
-     */    
-    public Double calcCo2Emission(Double heatDemand, Map<HeatingType, EnergySource> heatingToFuelMap) {
-        Double co2Emission = heatDemand * heatingToFuelMap.get(heatingType).getCo2Emission();
-        return co2Emission;
-    }
-
-    /**
-     * Renovates the building by applying the given renovation level.
+     * Renovates the building by applying the given renovation level, updating the last year of renovation and adding
+     * the hull renovation costs to the accumulated renovation costs.
      *
      * @param renovationLevel
      */
-    public void renovate(RenovationLevel renovationLevel) {
+    public void renovate(RenovationLevel renovationLevel, Integer yearOfRenovation) {
         this.renovationLevel = renovationLevel;
+        this.yearOfRenovation = yearOfRenovation;
+
+        this.accumulatedRenovationCosts += EnergyCalculator.getInstance().calcShellRenovationCosts(this);
+    }
+
+    public void exchangeHeatingSystem(HeatingType heatingSystem) {
+        this.heatingType = heatingSystem;
+        this.heatingTypeString = heatingType.toString();
+
+        this.accumulatedRenovationCosts += EnergyCalculator.getInstance().calcHeatingExchangeRenovationCosts(this);
     }
 }

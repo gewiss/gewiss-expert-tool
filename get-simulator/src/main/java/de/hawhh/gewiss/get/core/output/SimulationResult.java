@@ -3,15 +3,11 @@ package de.hawhh.gewiss.get.core.output;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 import lombok.Data;
 import org.javatuples.Triplet;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Data class for storing the results of a simulation scenario.
@@ -61,7 +57,7 @@ public class SimulationResult {
             quarterBuildings.addAll(buildings.values().stream().filter(building -> quarter.equals(building.getQuarter())).map(BuildingInformation::getBuildingId).collect(Collectors.toSet()));
         }
 
-        output.keySet().stream().forEach(year -> {
+        output.keySet().forEach(year -> {
             Double heatDemand = 0d;
 
             if (quarter == null) {
@@ -94,8 +90,8 @@ public class SimulationResult {
             quarterBuildings.addAll(buildings.values().stream().filter(building -> quarter.equals(building.getQuarter())).map(BuildingInformation::getBuildingId).collect(Collectors.toSet()));
         }
 
-        output.keySet().stream().forEach(year -> {
-            Long noRenovation = 0l, basicRenovation = 0l, goodRenovation = 0l;
+        output.keySet().forEach(year -> {
+            Long noRenovation = 0L, basicRenovation = 0L, goodRenovation = 0L;
 
             if (quarter == null) {
                 // if quarter is not set consider all results
@@ -190,7 +186,7 @@ public class SimulationResult {
 
         output.keySet().forEach((year) -> {
             Collection<SimulationOutput> outputs = output.get(year);
-            Double heatDemand = outputs.stream().collect(Collectors.summingDouble(SimulationOutput::getHeatDemand));
+            Double heatDemand = outputs.stream().mapToDouble(SimulationOutput::getHeatDemand).sum();
             System.out.print(year + "\t");
             System.out.printf("%f\n", heatDemand);
         });
