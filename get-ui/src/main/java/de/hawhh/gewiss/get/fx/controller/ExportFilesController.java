@@ -96,28 +96,29 @@ public class ExportFilesController {
 
             Integer rowNum = 0;
             Row topRow = sh.createRow(rowNum++);
-            topRow.createCell(0).setCellValue("Building Id");
-            topRow.createCell(1).setCellValue("Cluster Id");
-            topRow.createCell(2).setCellValue("Quarter");
-            topRow.createCell(3).setCellValue("Heat Demand");
-            topRow.createCell(4).setCellValue("Heat Demand m^2");
-            topRow.createCell(5).setCellValue("CO2 Emission");
-            topRow.createCell(6).setCellValue("Renovation Level");
-            topRow.createCell(7).setCellValue("Heating Type");
-            topRow.createCell(8).setCellValue("Renovation Cost");
+            topRow.createCell(0).setCellValue("Year");
+            topRow.createCell(1).setCellValue("Building Id");
+            topRow.createCell(2).setCellValue("Cluster Id");
+            topRow.createCell(3).setCellValue("Quarter");
+            topRow.createCell(4).setCellValue("Heat Demand");
+            topRow.createCell(5).setCellValue("Heat Demand m^2");
+            topRow.createCell(6).setCellValue("CO2 Emission");
+            topRow.createCell(7).setCellValue("Renovation Level");
+            topRow.createCell(8).setCellValue("Heating Type");
+            topRow.createCell(9).setCellValue("Renovation Cost");
 
             for (SimulationOutput so : result.getOutput().get(year)) {
                 Row row = sh.createRow(rowNum++);
-
-                row.createCell(0).setCellValue(so.getBuildingId());
-                row.createCell(1).setCellValue(bi.get(so.getBuildingId()).getClusterId());
-                row.createCell(2).setCellValue(bi.get(so.getBuildingId()).getQuarter());
-                row.createCell(3).setCellValue(so.getHeatDemand());
-                row.createCell(4).setCellValue(so.getHeatDemandM2());
-                row.createCell(5).setCellValue(so.getCo2Emission());
-                row.createCell(6).setCellValue(so.getRenovationLevelString());
-                row.createCell(7).setCellValue(so.getHeatingTypeString());
-                row.createCell(8).setCellValue(so.getRenovationCost());
+                row.createCell(0).setCellValue(so.getYear());
+                row.createCell(1).setCellValue(so.getBuildingId());
+                row.createCell(2).setCellValue(bi.get(so.getBuildingId()).getClusterId());
+                row.createCell(3).setCellValue(bi.get(so.getBuildingId()).getQuarter());
+                row.createCell(4).setCellValue(so.getHeatDemand());
+                row.createCell(5).setCellValue(so.getHeatDemandM2());
+                row.createCell(6).setCellValue(so.getCo2Emission());
+                row.createCell(7).setCellValue(so.getRenovationLevelString());
+                row.createCell(8).setCellValue(so.getHeatingTypeString());
+                row.createCell(9).setCellValue(so.getRenovationCost());
             }
         });
         LOGGER.info("Finished creating Excel workbook");
