@@ -106,6 +106,7 @@ public class ExportFilesController {
             topRow.createCell(7).setCellValue("Renovation Level");
             topRow.createCell(8).setCellValue("Heating Type");
             topRow.createCell(9).setCellValue("Renovation Cost");
+            topRow.createCell(10).setCellValue("Combined Floor Space");
 
             for (SimulationOutput so : result.getOutput().get(year)) {
                 Row row = sh.createRow(rowNum++);
@@ -119,6 +120,7 @@ public class ExportFilesController {
                 row.createCell(7).setCellValue(so.getRenovationLevelString());
                 row.createCell(8).setCellValue(so.getHeatingTypeString());
                 row.createCell(9).setCellValue(so.getRenovationCost());
+                row.createCell(10).setCellValue(so.getCombinedArea());
             }
         });
         LOGGER.info("Finished creating Excel workbook");

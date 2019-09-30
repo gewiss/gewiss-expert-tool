@@ -163,6 +163,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
             stmt.setString(1, buildingId);
 
             ResultSet rs = stmt.executeQuery();
+            // @TODO: add building ownership information: "property" (Bezitz)
             while (rs.next()) {
                 String alkisID = rs.getString("alkis_id");
                 String geomWkt = rs.getString("geomwkt");

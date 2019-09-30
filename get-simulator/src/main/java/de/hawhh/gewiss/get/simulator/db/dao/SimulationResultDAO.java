@@ -85,6 +85,8 @@ public class SimulationResultDAO {
             mapString("heating_system", SimulationOutput::getHeatingTypeString);
             mapDouble("renovation_cost", SimulationOutput::getRenovationCost);
             mapDouble("co2_emission", SimulationOutput::getCo2Emission);
+            // @TODO: add m2 addition and go over all instances of SimulationOutput anyway
+            mapDouble("combined_area", SimulationOutput::getCombinedArea);
         }
     }
 }

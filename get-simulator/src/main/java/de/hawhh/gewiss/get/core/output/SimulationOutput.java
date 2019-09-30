@@ -20,6 +20,7 @@ public class SimulationOutput {
     private HeatingType heatingType;
     private Double renovationCost;
     private Double co2Emission;
+    private Double combinedArea;
     
     
     public String getRenovationLevelString() {

@@ -157,10 +157,11 @@ public class Simulator extends Observable {
 
                 Double heatDemand = energyCalculator.calcHeatDemand(building);
                 Double co2Emission = energyCalculator.calcCO2Emission(building);
+                Double combinedArea = building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace();
 
                 output.setBuildingId(building.getAlkisID());
                 output.setHeatDemand(heatDemand);
-                output.setHeatDemandM2(heatDemand / (building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace()));
+                output.setHeatDemandM2(heatDemand / combinedArea);
                 output.setRenovationLevel(building.getRenovationLevel());
 
                 output.setYear(simYear);
@@ -168,6 +169,8 @@ public class Simulator extends Observable {
 
                 output.setHeatingType(building.getHeatingType());
                 output.setRenovationCost(building.getAccumulatedRenovationCosts());
+
+                output.setCombinedArea(combinedArea);
 
                 return output;
             }).collect(Collectors.toList());
