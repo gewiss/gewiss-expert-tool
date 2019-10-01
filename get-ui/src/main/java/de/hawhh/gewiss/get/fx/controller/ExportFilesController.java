@@ -13,13 +13,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * Controller for ExportFiles.fxml
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler; Antony Sotirov
  */
 public class ExportFilesController {
 
@@ -36,27 +36,32 @@ public class ExportFilesController {
     @FXML
     private Button exportButton;
     @FXML
+    private RadioButton csvRadio;
+    @FXML
     private RadioButton excelRadio;
     @FXML
     private ProgressBar exportProgess;
 
     private final static Logger LOGGER = Logger.getLogger(ExportFilesController.class.getName());
-
     public void init() {
         LOGGER.info("Initializing ExportFilesController");
 
         ToggleGroup toggleGroup = new ToggleGroup();
         excelRadio.setToggleGroup(toggleGroup);
         excelRadio.setSelected(true);
+        csvRadio.setToggleGroup(toggleGroup);
+        csvRadio.setSelected(false);
     }
 
     @FXML
     private void export() {
         SimulationResult result = SimulationResultHolder.getInstance().getResult();
         if (result != null) {
+            // @TODO: add date-time stamp to 'simulation-results' string
+            Stage stage = (Stage) exportFilesPane.getScene().getWindow();
+            final FileChooser fileChooser = new FileChooser();
             if (excelRadio.isSelected()) {
-                Stage stage = (Stage) exportFilesPane.getScene().getWindow();
-                final FileChooser fileChooser = new FileChooser();
+
                 fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel Open XML Format  (*.xlsx)", "*.xlsx"));
                 fileChooser.setInitialFileName("simulation-results");
                 File file = fileChooser.showSaveDialog(stage);
@@ -65,6 +70,23 @@ public class ExportFilesController {
                     @Override
                     protected Boolean call() {
                         return exportToExcel(result, file);
+                    }
+
+                };
+                exportTask.setOnSucceeded(event -> exportProgess.setProgress(1d));
+
+                new Thread(exportTask).start();
+                exportProgess.setProgress(-1d);
+            }
+            if (csvRadio.isSelected()) {
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PostgreSQL CSV Format  (*.csv)", "*.csv"));
+                fileChooser.setInitialFileName("simulation-results");
+                File file = fileChooser.showSaveDialog(stage);
+
+                Task<Boolean> exportTask = new Task<Boolean>() {
+                    @Override
+                    protected Boolean call() {
+                        return exportToCSV(result, file);
                     }
 
                 };
@@ -142,4 +164,58 @@ public class ExportFilesController {
 
         return false;
     }
+
+    /**
+     * Export the given SimulationResult to the given CSV file.
+     * The file is formatted using the Apache Commons CSV library using PostgreSQL formatting.
+     *
+     * @param result the given SimulationResult
+     * @param file the given (csv) file
+     * @return true if the export was successful, otherwise false
+     */
+    // @TODO: testing
+    private boolean exportToCSV(SimulationResult result, File file) {
+        LOGGER.info("Exporting Simulation Results to CSV");
+        Boolean success = false;
+        try {
+            BufferedWriter csvWriter = new BufferedWriter(new FileWriter(file));
+
+            CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.POSTGRESQL_CSV.withHeader(
+                    "Year", "Building ID", "Cluster ID", "Quarter", "Heat Demand", "Head Demand m^2", "CO2 emission",
+                    "Renovation Level", "Heating Type", "Renovation Cost", "Combined Floor Space"));
+
+            Map<String, BuildingInformation> bi = result.getBuildings();
+
+            // not lambda as it would need internal exception handling (printRecord throws IOException)
+            for (Integer year : result.getOutput().keySet()) {
+                LOGGER.log(Level.INFO, "Writing data to CSV file for {0}", year);
+                for (SimulationOutput so : result.getOutput().get(year)) {
+                    csvPrinter.printRecord(
+                            so.getYear(),
+                            so.getBuildingId(),
+                            bi.get(so.getBuildingId()).getClusterId(),
+                            bi.get(so.getBuildingId()).getQuarter(),
+                            so.getHeatDemand(),
+                            so.getHeatDemandM2(),
+                            so.getCo2Emission(),
+                            so.getRenovationLevelString(),
+                            so.getHeatingTypeString(),
+                            so.getRenovationCost(),
+                            so.getCombinedArea()
+                    );
+                }
+            }
+            // close all IO streams
+            csvPrinter.close(true);
+            csvWriter.close();
+            LOGGER.info("Finished writing CSV file");
+
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(ExportFilesController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;
+    }
+
 }

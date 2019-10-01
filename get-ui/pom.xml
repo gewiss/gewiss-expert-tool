@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.hawhh.gewiss</groupId>
     <artifactId>get-ui</artifactId>
-    <version>0.3</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
     
     <name>GET-UI</name>
@@ -31,6 +31,16 @@
         <developer>
             <name>Nils Weiss</name>
             <email>nils.weiss@haw-hamburg.de</email>
+            <organization>HAW Hamburg</organization>
+            <organizationUrl>https://www.haw-hamburg.de</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Antony Sotirov</name>
+            <email>antony.sotirov@haw-hamburg.de</email>
             <organization>HAW Hamburg</organization>
             <organizationUrl>https://www.haw-hamburg.de</organizationUrl>
             <roles>
@@ -79,12 +89,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.5</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
             <version>8.40.14</version>
@@ -105,6 +109,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.7</version>
         </dependency>
     </dependencies>
     
