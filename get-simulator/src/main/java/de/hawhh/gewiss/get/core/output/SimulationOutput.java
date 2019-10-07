@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @Data
 public class SimulationOutput {
-    
+
     private String buildingId;
     private Integer year;
     private Double heatDemandM2;

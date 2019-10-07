@@ -65,15 +65,16 @@ public class Simulator extends Observable {
      */
     public SimulationResult simulate(SimulationParameter parameter, List<ScoringMethod> scoringMethods, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
         long startTime = System.currentTimeMillis();
-
-        if (rgSeed != null) {
-            // set the seed for the random generator
-            this.randomGenerator.setSeed(rgSeed);
+        long seedInternal; // @TODO: use just rgSeed
+        // if seed is not explicitly set, use system time in nano second to create new "random" seed for each run.
+        if (rgSeed == null) {
+            seedInternal = System.nanoTime();
         } else {
-            // if the seed is not explicitly set, use the system time in nano second to create new "random" seed for each run.
-            this.randomGenerator.setSeed(System.nanoTime());
+            seedInternal = rgSeed;
         }
-
+        // set the seed for the random generator
+        LOGGER.log(Level.INFO, "The seed for the simulation is {0}", seedInternal);
+        this.randomGenerator.setSeed(seedInternal);
         // Validate the input factors
         parameter.validate();
 
@@ -84,6 +85,7 @@ public class Simulator extends Observable {
         //buildings = buildings.subList(0, 20);
 
         SimulationResult result = new SimulationResult();
+        result.setSeed(seedInternal);
         result.setName(parameter.getName());
         // Convert parameter to string representation for storage in db
         // Add special support for Guava (Google) datatype for Jackson

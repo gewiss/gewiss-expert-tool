@@ -32,8 +32,8 @@ public class SimulationResultDAO {
     /**
      * Save the given {@link SimulationResult} and return the created ID (key).
      *
-     * @param sr
-     * @return
+     * @param sr SimulationResult Object
+     * @return created ID key
      */
     public Integer save(SimulationResult sr) {
         Integer key = null;

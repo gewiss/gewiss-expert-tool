@@ -44,7 +44,6 @@
             <organization>HAW Hamburg</organization>
             <organizationUrl>https://www.haw-hamburg.de</organizationUrl>
             <roles>
-                <role>architect</role>
                 <role>developer</role>
             </roles>
         </developer>

@@ -57,13 +57,13 @@ public class ExportFilesController {
     private void export() {
         SimulationResult result = SimulationResultHolder.getInstance().getResult();
         if (result != null) {
-            // @TODO: add date-time stamp to 'simulation-results' string
+            // @TODO: add date-time stamp to 'simulation-results' string?
             Stage stage = (Stage) exportFilesPane.getScene().getWindow();
             final FileChooser fileChooser = new FileChooser();
             if (excelRadio.isSelected()) {
 
                 fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel Open XML Format  (*.xlsx)", "*.xlsx"));
-                fileChooser.setInitialFileName("simulation-results");
+                fileChooser.setInitialFileName("simulation-results_" + result.getSeed().toString());
                 File file = fileChooser.showSaveDialog(stage);
 
                 Task<Boolean> exportTask = new Task<Boolean>() {
@@ -80,7 +80,7 @@ public class ExportFilesController {
             }
             if (csvRadio.isSelected()) {
                 fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PostgreSQL CSV Format  (*.csv)", "*.csv"));
-                fileChooser.setInitialFileName("simulation-results");
+                fileChooser.setInitialFileName("simulation-results_" + result.getSeed().toString());
                 File file = fileChooser.showSaveDialog(stage);
 
                 Task<Boolean> exportTask = new Task<Boolean>() {
