@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Controller for the InitialParameter.fxml view.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class InitialParametersController {
     
@@ -265,7 +265,7 @@ public class InitialParametersController {
      */
     @FXML
     private void generateSeed() {
-        Long seed = System.nanoTime();
+        Long seed = System.currentTimeMillis();
         globalSeed.setText(String.valueOf(seed));
     }
 
@@ -299,9 +299,23 @@ public class InitialParametersController {
     public List<HeatingSystemExchangeRate> getHeatingSystemExchangeRates() {
         return heatingSystemExchangeTable.getItems();
     }
-    
+
+    /**
+     *  If no seed is present (empty-string ""), then generate one automatically and set the corresponding field.
+     *
+     * @return the seed used in the simulation
+     */
     public Long getSeed() {
-        return Long.parseLong(globalSeed.getText());
+        String text = globalSeed.getText();
+        Long seed = null;
+        try {
+            seed = Long.parseLong(text);
+        } catch (NumberFormatException e) {
+            seed = System.currentTimeMillis();
+            globalSeed.setText(String.valueOf(seed));
+        } finally {
+            return seed;
+        }
     }
     
     public List<String> getSelectedRankingMethods() {
