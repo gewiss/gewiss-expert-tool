@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * The main simulator class.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class Simulator extends Observable {
 
@@ -161,7 +161,11 @@ public class Simulator extends Observable {
 
                 output.setBuildingId(building.getAlkisID());
                 output.setHeatDemand(heatDemand);
-                output.setHeatDemandM2(heatDemand / combinedArea);
+                if (combinedArea != 0) {
+                    output.setHeatDemandM2(heatDemand / combinedArea);
+                } else {
+                    output.setHeatDemandM2(0.0);
+                }
                 output.setRenovationLevel(building.getRenovationLevel());
 
                 output.setYear(simYear);
@@ -170,6 +174,7 @@ public class Simulator extends Observable {
                 output.setHeatingType(building.getHeatingType());
                 output.setRenovationCost(building.getAccumulatedRenovationCosts());
 
+                output.setResidentialArea(building.getResidentialFloorSpace());
                 output.setCombinedArea(combinedArea);
 
                 return output;

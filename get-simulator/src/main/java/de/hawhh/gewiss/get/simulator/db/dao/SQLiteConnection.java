@@ -14,8 +14,8 @@ import java.util.logging.Logger;
  */
 public class SQLiteConnection {
 
-    //public final static String DB_FILE = "/GEWISS_buildings_v_1.16.8_IST.sqlite";
-    public final static String DB_FILE = "/GEWISS_buildings_1.16.8_IST_anonymized_for_testing.sqlite";
+    public final static String DB_FILE = "/GEWISS_buildings_v_1.16.8_IST.sqlite";
+    //public final static String DB_FILE = "/GEWISS_buildings_1.16.8_IST_anonymized_for_testing.sqlite";
     
     private final static Logger LOGGER = Logger.getLogger(SQLiteConnection.class.getName());
 
@@ -40,7 +40,7 @@ public class SQLiteConnection {
                     // check if the program is running in a jar or from IDE
                     if (SQLiteConnection.class.getResource("SQLiteConnection.class").getProtocol().equals("jar")) {
                         LOGGER.info("Running from JAR");
-                        url = "jdbc:sqlite::resource:jar:file:lib/get-simulator-0.3.jar!" + DB_FILE;
+                        url = "jdbc:sqlite::resource:jar:file:lib/get-simulator-0.3.1.jar!" + DB_FILE;
                     } else {
                         LOGGER.info("Running from IDE");
 

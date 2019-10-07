@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 /**
  * Controller for ExportFiles.fxml
  *
- * @author Thomas Preisler; Antony Sotirov
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class ExportFilesController {
 
@@ -128,7 +128,8 @@ public class ExportFilesController {
             topRow.createCell(7).setCellValue("Renovation Level");
             topRow.createCell(8).setCellValue("Heating Type");
             topRow.createCell(9).setCellValue("Renovation Cost");
-            topRow.createCell(10).setCellValue("Combined Floor Space");
+            topRow.createCell(10).setCellValue("Residential Floor Space");
+            topRow.createCell(11).setCellValue("Combined Floor Space");
 
             for (SimulationOutput so : result.getOutput().get(year)) {
                 Row row = sh.createRow(rowNum++);
@@ -142,7 +143,8 @@ public class ExportFilesController {
                 row.createCell(7).setCellValue(so.getRenovationLevelString());
                 row.createCell(8).setCellValue(so.getHeatingTypeString());
                 row.createCell(9).setCellValue(so.getRenovationCost());
-                row.createCell(10).setCellValue(so.getCombinedArea());
+                row.createCell(10).setCellValue(so.getResidentialArea());
+                row.createCell(11).setCellValue(so.getCombinedArea());
             }
         });
         LOGGER.info("Finished creating Excel workbook");
@@ -182,7 +184,8 @@ public class ExportFilesController {
 
             CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.POSTGRESQL_CSV.withHeader(
                     "Year", "Building ID", "Cluster ID", "Quarter", "Heat Demand", "Head Demand m^2", "CO2 emission",
-                    "Renovation Level", "Heating Type", "Renovation Cost", "Combined Floor Space"));
+                    "Renovation Level", "Heating Type", "Renovation Cost", "Residential Floor Space",
+                    "Combined Floor Space"));
 
             Map<String, BuildingInformation> bi = result.getBuildings();
 
@@ -201,6 +204,7 @@ public class ExportFilesController {
                             so.getRenovationLevelString(),
                             so.getHeatingTypeString(),
                             so.getRenovationCost(),
+                            so.getResidentialArea(),
                             so.getCombinedArea()
                     );
                 }

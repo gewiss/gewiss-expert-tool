@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * Data class for storing the building specific simulation results for one year.
  * 
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 @Data
 public class SimulationOutput {
@@ -20,9 +20,9 @@ public class SimulationOutput {
     private HeatingType heatingType;
     private Double renovationCost;
     private Double co2Emission;
+    private Double residentialArea;
     private Double combinedArea;
-    
-    
+
     public String getRenovationLevelString() {
         return this.renovationLevel.toString();
     }
