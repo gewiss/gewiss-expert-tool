@@ -47,6 +47,7 @@ public class SimulatorTest {
         mod1.setTargetQuarters(Arrays.asList("Nienstedten", "Othmarschen", "Ottensen", "Altona-Altstadt", "Rissen", "Blankenese", "Osdorf", "Iserbrook", "Groß Flottbek",
                 "Bahrenfeld", "Altona-Nord", "Sternschanze", "Sülldorf", "Lurup"));
         mod1.setTargetBuildingsTypes(Arrays.asList("EFH_C", "EFH_I", "EFH_B", "EFH_G", "EFH_A", "EFH_F", "EFH_J", "EFH_K", "EFH_L", "EFH_H", "EFH_E", "EFH_D"));
+        // @TODO: add mod1.setTargetOwnershipTypes(...);
         modifiers.add(mod1);
 
         this.simParams = new SimulationParameter(name, simStop, modifiers);

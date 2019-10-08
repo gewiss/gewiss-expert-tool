@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * DAO interface for the {@link Building} class.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public interface BuildingDAO {
 
@@ -27,14 +27,21 @@ public interface BuildingDAO {
     Building findById(String buildingId);
     
     /**
-     * Returns a List of alle the different residential building types.
+     * Returns a List of alle the *different* residential building types.
      * @return 
      */
     List<String> getResidentialBuildingTypes();
     
     /**
-     * Returns a List of all the different types of non-residential buildings.
+     * Returns a List of all the *different* types of non-residential buildings.
      * @return 
      */
     List<String> getNonResidentialBuildingTypes();
+
+    /**
+     * Returns a list of all the *different* building owners.
+     * @return
+     */
+    // @TODO: add tests
+    List<String> getOwnershipTypes();
 }

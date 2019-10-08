@@ -24,7 +24,7 @@ public class Building {
     private Integer yearOfRenovation;
     private String residentialType; // IWU-Typ
     private String nonResidentialType; //NWG-Typ
-    private String property; // Besitz
+    private String ownership; // Eigentum
     private Boolean monument; // Denkmal
     private ConstructionAgeClass constructionAgeClass; // Baualtersklasse
     private RenovationLevel renovationLevel;

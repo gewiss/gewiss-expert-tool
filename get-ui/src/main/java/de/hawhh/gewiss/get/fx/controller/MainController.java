@@ -66,7 +66,7 @@ public class MainController {
                 + "- Nils Weiss (HAW Hamburg)\n"
                 + "- Antony Sotirov (HAW Hamburg)\n\n"
                 + "The data model as well as the actual data was provided by Ivan Dochev (HCU Hamburg).\n\n"
-                + "Additional contributers: Arjun Jamil (HAW Hamburg), Ev Köhler (HAW Hamburg), Hannes Seller (HCU Hamburg).\n\n"
+                + "Additional contributors: Arjun Jamil (HAW Hamburg), Ev Köhler (HAW Hamburg), Hannes Seller (HCU Hamburg).\n\n"
                 + "Project lead: Wolfgang Renz (HAW Hamburg), Irene Peters (HCU Hamburg).\n\n"
                 + "All participants were part of the GEWISS Project (http://gewiss.haw-hamburg.de/) funded by the German Federal Ministry for Economic Affairs and Energy.\n\n"
                 + "Icon made by Freepik (www.freepik.com) from www.flaticon.com.");

@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 /**
  * FXML Controller class for the Input.fxml.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 @SuppressWarnings("ALL")
 public class InputController implements Observer {
@@ -77,6 +77,8 @@ public class InputController implements Observer {
     private Multimap<String, String> locationMap;
     // Multimap containing IWU and Ecofys as keys and the according building types as values
     private Multimap<String, String> buildingTypeMap;
+    // Ordered set of unique building owners
+    private List<String> buildingOwnershipTypes;
 
     private final static Logger LOGGER = Logger.getLogger(InputController.class.getName());
 
@@ -98,6 +100,8 @@ public class InputController implements Observer {
         initLocationMap();
         buildingTypeMap = TreeMultimap.create();
         initBuildingTypeMap();
+        buildingOwnershipTypes = new ArrayList<>();
+        initBuildingOwnershipTypes();
 
         initialParametersController.init();
         firstModifierController.init(this);
@@ -211,12 +215,20 @@ public class InputController implements Observer {
         buildingTypeMap.putAll(NON_RESIDENTIAL_BUILDINGS, buildingDAO.getNonResidentialBuildingTypes());
     }
 
+    private void initBuildingOwnershipTypes() {
+        buildingOwnershipTypes.addAll(buildingDAO.getOwnershipTypes());
+    }
+
     public Multimap<String, String> getLocationMap() {
         return locationMap;
     }
 
     public Multimap<String, String> getBuildingTypeMap() {
         return buildingTypeMap;
+    }
+
+    public List<String> getBuildingOwnershipTypes() {
+        return buildingOwnershipTypes;
     }
 
     @FXML

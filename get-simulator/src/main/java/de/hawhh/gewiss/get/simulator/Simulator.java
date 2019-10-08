@@ -86,6 +86,7 @@ public class Simulator extends Observable {
         SimulationResult result = new SimulationResult();
         result.setSeed(rgSeed);
         result.setName(parameter.getName());
+        
         // Convert parameter to string representation for storage in db
         // Add special support for Guava (Google) datatype for Jackson
         ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());
@@ -102,10 +103,10 @@ public class Simulator extends Observable {
             final Integer simYear = i;
             LOGGER.log(Level.INFO, "Simulating year {0}", simYear);
 
-            // Don't perform a simulation in the first year, here we just calculate the status quo
+            // Don't perform a simulation in the first year; just calculate the status quo (List<SimulationOutput> loop)
             if (i > SimulationParameter.FIRST_YEAR) {
                 // Use the stream api to calc the scores in parallel and store the building and scores in a new List
-                LOGGER.info("Calculating initial scoring values");
+                LOGGER.log(Level.INFO, "Calculating initial scoring values for year {0}", simYear);
                 List<ScoredBuilding> scoredBuildings = buildings.stream().parallel().map(building -> {
                     ScoredBuilding scoredBuilding = new ScoredBuilding(building);
 
@@ -133,7 +134,7 @@ public class Simulator extends Observable {
                 //LOGGER.info("Combined Normalized Scoring Values");
                 //printScoredBuilding(scoredBuildings);
 
-                // Apply modifiers
+                // Apply modifiers // @TODO: investigate for adding modifier ownership
                 LOGGER.info("Applying modifiers to scoring values");
                 if (parameter.getModifiers() != null) {
                     scoredBuildings.parallelStream().forEach(sb -> {
@@ -152,6 +153,7 @@ public class Simulator extends Observable {
                 // Apply renovation strategy
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
             }
+
             // Calc heat demand and store results
             List<SimulationOutput> outputs = buildings.stream().parallel().map(building -> {
                 SimulationOutput output = new SimulationOutput();
