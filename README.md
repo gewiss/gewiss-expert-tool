@@ -49,6 +49,7 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | bj_alk_dt     | Integer   | Year of construction |
 | dt_san_year   | Integer   | Last year of renovation |
 | dt_heiztyp    | String    | Heating system type |
+| dt_eigentum   | String    | Building Ownership Information |
 | iwu_typ       | String    | Residential building type |
 | nwg_typ       | String    | Non-residential building type |
 | bak_fin       | String    | Construction age class |
