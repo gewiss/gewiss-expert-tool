@@ -42,6 +42,5 @@ public interface BuildingDAO {
      * Returns a list of all the *different* building owners.
      * @return
      */
-    // @TODO: add tests
     List<String> getOwnershipTypes();
 }

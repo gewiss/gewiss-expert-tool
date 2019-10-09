@@ -74,4 +74,14 @@ public class SQLiteBuildingDAOTest {
             assertEquals(19, types.size());
         }
     }
+
+    @Test
+    public void testGetOwnershipTypes() {
+        List<String> owners = dao.getOwnershipTypes();
+        assertNotNull(owners);
+
+        if (SQLiteConnection.DB_FILE.contains("anonymized")) {
+            assertEquals(2, owners.size()); // "PRIVAT" & "UNKNOWN"
+        }
+    }
 }

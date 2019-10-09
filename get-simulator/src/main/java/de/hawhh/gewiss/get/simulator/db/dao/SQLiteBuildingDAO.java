@@ -21,7 +21,6 @@ import java.util.logging.Logger;
  *
  * @author Thomas Preisler, Antony Sotirov
  */
- // @TODO: add MD github info about required dataset (dt_eigentum)
 public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
 
     private final static Logger LOGGER = Logger.getLogger(SQLiteBuildingDAO.class.getName());

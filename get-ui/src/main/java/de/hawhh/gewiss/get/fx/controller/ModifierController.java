@@ -339,7 +339,6 @@ public class ModifierController {
 
     private List<String> getSelectedOwnershipTypes() {
         List<String> owners = new ArrayList<>();
-        // @TODO: test
         ownerCheckTree.getCheckModel().getCheckedItems().stream()
             .filter((item) -> (item.getChildren().isEmpty()))
             .forEachOrdered((item) -> owners.add(item.getValue()));

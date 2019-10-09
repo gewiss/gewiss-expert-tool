@@ -134,7 +134,7 @@ public class Simulator extends Observable {
                 //LOGGER.info("Combined Normalized Scoring Values");
                 //printScoredBuilding(scoredBuildings);
 
-                // Apply modifiers // @TODO: investigate for adding modifier ownership
+                // Apply modifiers
                 LOGGER.info("Applying modifiers to scoring values");
                 if (parameter.getModifiers() != null) {
                     scoredBuildings.parallelStream().forEach(sb -> {
