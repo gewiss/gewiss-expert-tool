@@ -154,11 +154,20 @@ public class Simulator extends Observable {
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
             }
 
+            //@TODO: call new lin-interpolation method in energyCalculator instance (with SimParam check if requested)
+            // using Co2FactorsTable
+            // for the two year ranges: 2019 (start) - 2030; 2030 - 2050 (end) [ranges hardcoded at first, then flex]
+            // create a MAP of <int year, Double co2> co2_year and store in PrimaryEnergyFactor instance
+            // set a static flag in energyCalculator that data exists and can be retrieved.
+
             // Calc heat demand and store results
             List<SimulationOutput> outputs = buildings.stream().parallel().map(building -> {
                 SimulationOutput output = new SimulationOutput();
 
                 Double heatDemand = energyCalculator.calcHeatDemand(building);
+
+
+                // if requested: grab CO2 factors: usie calcCO2Emission(building, year) instead of regular method
                 Double co2Emission = energyCalculator.calcCO2Emission(building);
                 Double combinedArea = building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace();
 

@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class SimulationParameter {
 
-    public static final int FIRST_YEAR = 2017;
+    public static final int FIRST_YEAR = 2019; //@TODO: maybe grab from new DB field (discuss with Team Peters)?
 
     private Integer stopYear;
     private List<Modifier> modifiers = new ArrayList<>();

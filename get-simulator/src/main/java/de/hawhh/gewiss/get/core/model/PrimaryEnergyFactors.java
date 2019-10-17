@@ -3,7 +3,7 @@ package de.hawhh.gewiss.get.core.model;
 import lombok.Data;
 
 @Data
-public class PrimaryEnergyFactor {
+public class PrimaryEnergyFactors {
 
     private HeatingType heatingSystem;
     private EnergySourceType energySourceType;

@@ -39,9 +39,9 @@ public class EnergyCalculator {
     private final Map<HeatingType, Map<Integer, Double>> costsHeatingSystemMap;
 
     /**
-     * Map mapping {@link HeatingType} to {@link PrimaryEnergyFactor}.
+     * Map mapping {@link HeatingType} to {@link PrimaryEnergyFactors}.
      */
-    private final Map<HeatingType, PrimaryEnergyFactor> primaryEnergyFactorsMap;
+    private final Map<HeatingType, PrimaryEnergyFactors> primaryEnergyFactorsMap;
 
     public static EnergyCalculator getInstance() {
         return ourInstance;
@@ -61,6 +61,7 @@ public class EnergyCalculator {
         this.costsBuildingShellMap = costsBuildingShellDAO.findAll();
         this.costsHeatingSystemMap = costsHeatingSystemDAO.findAll();
         this.primaryEnergyFactorsMap = primaryEnergyFactorsDAO.findAll();
+
     }
 
     /**
@@ -99,6 +100,9 @@ public class EnergyCalculator {
      * @param building
      * @return
      */
+    //@TODO: create an overloaded method  with calcCO2Emission(Building building, int year)
+    // use original method calcCO2Emission(Bulding building) if decreasing CO2 not requested or if first year(?)
+    // Be careful with edge cases: initial year vs DB data; final year sim vs final year CO2
     public Double calcCO2Emission(Building building) {
         Double co2Emission = 0d;
 

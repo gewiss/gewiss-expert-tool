@@ -2,7 +2,7 @@ package de.hawhh.gewiss.get.simulator.db.dao;
 
 import de.hawhh.gewiss.get.core.model.EnergySourceType;
 import de.hawhh.gewiss.get.core.model.HeatingType;
-import de.hawhh.gewiss.get.core.model.PrimaryEnergyFactor;
+import de.hawhh.gewiss.get.core.model.PrimaryEnergyFactors;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,12 +25,12 @@ public class PrimaryEnergyFactorsDAO extends SQLiteDAO {
     }
 
     /**
-     * Find all {@link PrimaryEnergyFactor}s as a {@link Map} where the {@link HeatingType} is the key and the {@link PrimaryEnergyFactor} the value.
+     * Find all {@link PrimaryEnergyFactors}s as a {@link Map} where the {@link HeatingType} is the key and the {@link PrimaryEnergyFactors} the value.
      *
      * @return
      */
-    public Map<HeatingType, PrimaryEnergyFactor> findAll() {
-        Map<HeatingType, PrimaryEnergyFactor> results = new HashMap<>();
+    public Map<HeatingType, PrimaryEnergyFactors> findAll() {
+        Map<HeatingType, PrimaryEnergyFactors> results = new HashMap<>();
         String sql = "SELECT HEATING_SYSTEM, ENERGY_SOURCE_TYPE, PRIMARY_ENERGY_FACTOR, CO2 FROM primary_energy_factors";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -41,13 +41,13 @@ public class PrimaryEnergyFactorsDAO extends SQLiteDAO {
                 Double pef = rs.getDouble(3);
                 Double co2 = rs.getDouble(4);
 
-                PrimaryEnergyFactor primaryEnergyFactor = new PrimaryEnergyFactor();
-                primaryEnergyFactor.setHeatingSystem(heatingType);
-                primaryEnergyFactor.setEnergySourceType(energySourceType);
-                primaryEnergyFactor.setPrimaryEnergyFactor(pef);
-                primaryEnergyFactor.setCo2(co2);
+                PrimaryEnergyFactors primaryEnergyFactors = new PrimaryEnergyFactors();
+                primaryEnergyFactors.setHeatingSystem(heatingType);
+                primaryEnergyFactors.setEnergySourceType(energySourceType);
+                primaryEnergyFactors.setPrimaryEnergyFactor(pef);
+                primaryEnergyFactors.setCo2(co2);
 
-                results.put(heatingType, primaryEnergyFactor);
+                results.put(heatingType, primaryEnergyFactors);
             }
         } catch (SQLException e) {
             LOGGER.severe(e.getMessage());
@@ -57,12 +57,12 @@ public class PrimaryEnergyFactorsDAO extends SQLiteDAO {
     }
 
     /**
-     * Find the {@link PrimaryEnergyFactor} for the given {@link HeatingType}.
+     * Find the {@link PrimaryEnergyFactors} for the given {@link HeatingType}.
      *
      * @param heatingSystem
      * @return
      */
-    public PrimaryEnergyFactor findBy(HeatingType heatingSystem) {
+    public PrimaryEnergyFactors findBy(HeatingType heatingSystem) {
         LOGGER.info("Getting primary energy factors for heating system " + heatingSystem);
 
         String sql = "SELECT HEATING_SYSTEM, ENERGY_SOURCE_TYPE, PRIMARY_ENERGY_FACTOR, CO2 FROM primary_energy_factors" +
@@ -79,13 +79,13 @@ public class PrimaryEnergyFactorsDAO extends SQLiteDAO {
                 Double co2 = rs.getDouble("CO2");
                 EnergySourceType energySource = EnergySourceType.valueOf(rs.getString("ENERGY_SOURCE_TYPE"));
 
-                PrimaryEnergyFactor primaryEnergyFactor = new PrimaryEnergyFactor();
-                primaryEnergyFactor.setHeatingSystem(heatingSystem);
-                primaryEnergyFactor.setEnergySourceType(energySource);
-                primaryEnergyFactor.setPrimaryEnergyFactor(pef);
-                primaryEnergyFactor.setCo2(co2);
+                PrimaryEnergyFactors primaryEnergyFactors = new PrimaryEnergyFactors();
+                primaryEnergyFactors.setHeatingSystem(heatingSystem);
+                primaryEnergyFactors.setEnergySourceType(energySource);
+                primaryEnergyFactors.setPrimaryEnergyFactor(pef);
+                primaryEnergyFactors.setCo2(co2);
 
-                return primaryEnergyFactor;
+                return primaryEnergyFactors;
             }
         } catch (SQLException e) {
             LOGGER.severe(e.getMessage());

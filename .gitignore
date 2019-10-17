@@ -902,3 +902,11 @@
 /get-simulator/target/surefire/surefire8543565776953654752tmp
 /get-simulator/target/surefire/surefire_09149582891269146746tmp
 /get-simulator/target/surefire/surefirebooter3271666461662982629.jar
+/get-ui/target/jfx/app/lib/get-simulator-0.3.2.jar
+/get-simulator/target/get-simulator-0.3.2.jar
+/get-ui/target/get-ui-0.3.2.jar
+/get-ui/target/jfx/app/get-ui-0.3.2-jfx.jar
+/get-ui/.idea/libraries/Maven__de_hawhh_gewiss_get_simulator_0_3_2.xml
+/get-simulator/target/classes/de/hawhh/gewiss/get/core/input/CO2FactorsData.class
+/get-simulator/target/classes/de/hawhh/gewiss/get/core/model/PrimaryEnergyFactors.class
+/get-simulator/.idea/uiDesigner.xml

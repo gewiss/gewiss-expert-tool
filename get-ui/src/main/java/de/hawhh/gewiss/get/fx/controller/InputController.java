@@ -297,7 +297,7 @@ public class InputController implements Observer {
                     scoringMethods.add(new CO2EmissionSquareMeterFactor());
                 }
                 
-                // Renovation strategy
+                // Renovation strategy (hard-coded to RenovationHeatExchangeRateStrategy!)
                 Double renovationRate = initialParametersController.getRenovationRate();
                 Double passiveHouseRate = initialParametersController.getPassiveHouseRate();
                 List<HeatingSystemExchangeRate> heatingSystemExchangeRates = initialParametersController.getHeatingSystemExchangeRates();
