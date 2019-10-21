@@ -65,6 +65,7 @@ public class Simulator extends Observable {
      */
     public SimulationResult simulate(SimulationParameter parameter, List<ScoringMethod> scoringMethods, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
         long startTime = System.currentTimeMillis();
+        Boolean hasCO2Factors;
 
         // if seed is not explicitly set, use system time in nano second to create new "random" seed for each run.
         if (rgSeed == null) {
@@ -76,6 +77,13 @@ public class Simulator extends Observable {
 
         // Validate the input factors
         parameter.validate();
+
+        // check if yearly CO2 Factors Data is present and store state
+        hasCO2Factors = parameter.hasCO2FactorsData();
+        // and populate list for linear interpolation
+        if(hasCO2Factors) {
+            this.energyCalculator.prepCO2YearlyRates(parameter.getYearlyCO2Factors());
+        }
 
         // Fetch the building from the DB
         List<Building> buildings = fetchBuildings();
@@ -154,21 +162,20 @@ public class Simulator extends Observable {
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
             }
 
-            //@TODO: call new lin-interpolation method in energyCalculator instance (with SimParam check if requested)
-            // using Co2FactorsTable
-            // for the two year ranges: 2019 (start) - 2030; 2030 - 2050 (end) [ranges hardcoded at first, then flex]
-            // create a MAP of <int year, Double co2> co2_year and store in PrimaryEnergyFactor instance
-            // set a static flag in energyCalculator that data exists and can be retrieved.
 
             // Calc heat demand and store results
             List<SimulationOutput> outputs = buildings.stream().parallel().map(building -> {
                 SimulationOutput output = new SimulationOutput();
-
                 Double heatDemand = energyCalculator.calcHeatDemand(building);
 
-
+                Double co2Emission;
                 // if requested: grab CO2 factors: usie calcCO2Emission(building, year) instead of regular method
-                Double co2Emission = energyCalculator.calcCO2Emission(building);
+                if (hasCO2Factors) {
+                    co2Emission = energyCalculator.calcCO2Emission(building, simYear);
+                } else {
+                    co2Emission = energyCalculator.calcCO2Emission(building);
+                }
+
                 Double combinedArea = building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace();
 
                 output.setBuildingId(building.getAlkisID());
@@ -231,7 +238,8 @@ public class Simulator extends Observable {
         //mod1.setTargetBuildingsTypes(Arrays.asList("EFH_C", "EFH_I", "EFH_B", "EFH_G", "EFH_A", "EFH_F", "EFH_J", "EFH_K", "EFH_L", "EFH_H", "EFH_E", "EFH_D"));
         //modifiers.add(mod1);
 
-        SimulationParameter parameter = new SimulationParameter(name, simStop, modifiers);
+        // yearlyCO2Factors == null: use constant CO2 factors data instead
+        SimulationParameter parameter = new SimulationParameter(name, simStop, modifiers, null);
 
         // Add special support for Guava (Google) datatype for Jackson
         //ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());

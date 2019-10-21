@@ -50,7 +50,8 @@ public class SimulatorTest {
         mod1.setTargetOwnershipTypes(Arrays.asList("PRIVAT", "UNKNOWN"));
         modifiers.add(mod1);
 
-        this.simParams = new SimulationParameter(name, simStop, modifiers);
+        // @TODO: test with yearlyCO2 as well (and without too!)
+        this.simParams = new SimulationParameter(name, simStop, modifiers, null);
 
         this.scoringMethods = new ArrayList<>();
         this.scoringMethods.add(new BuildingAgeFactor());

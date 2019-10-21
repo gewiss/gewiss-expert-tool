@@ -3,6 +3,7 @@ package de.hawhh.gewiss.get.fx.controller;
 import de.hawhh.gewiss.get.core.input.CO2FactorsData;
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.simulator.db.dao.PrimaryEnergyFactorsDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,7 +15,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 import org.controlsfx.control.CheckComboBox;
-
 import java.util.List;
 
 /**
@@ -27,6 +27,7 @@ public class InitialParametersController {
     public static final String BUILDING_AGE = "Building Age/Last Renovation";
     public static final String CO2_EMISSION = "CO2 Emission";
     public static final String CO2_EMISSION_SQUARE_METER = "CO2 Emission (m^2)";
+    private PrimaryEnergyFactorsDAO energyFactorsDAO;
 
     // Initial simulation parameters
     @FXML
@@ -200,6 +201,9 @@ public class InitialParametersController {
      * Initializes the CO2 Factors Data table and connects the view to the underlying data model.
      */
     private void initCO2FactorsTable() {
+        // instantiate energyFactorsDAO, needed to get start year CO2 Factors
+        energyFactorsDAO = new PrimaryEnergyFactorsDAO();
+
         // Define the connection between data model and table columns
         heatingSystem.setCellValueFactory(new PropertyValueFactory<>("heatingSystem"));
 
@@ -259,10 +263,45 @@ public class InitialParametersController {
      */
     private ObservableList<CO2FactorsData> getCO2FactorsDataList() {
         return FXCollections.observableArrayList(
-            // @TODO: grab data for startEmissions from sqlite DB
-            new CO2FactorsData(HeatingType.CONDENSING_BOILER, 247d, 125d, 109d),
-            new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR, 247d, 125d, 109d)
+            // NB: not a loop as rate changes not uniform across HeatingTypes
+            // @TODO: optional -> have loop anyway that calls a method on HeatingTypes which does switch statements with a default ;)
+            new CO2FactorsData(
+                HeatingType.CONDENSING_BOILER,
+                getStartEmissions(HeatingType.CONDENSING_BOILER), 231d, 204d),
+            new CO2FactorsData(
+                HeatingType.CONDENSING_BOILER_SOLAR,
+                getStartEmissions(HeatingType.CONDENSING_BOILER_SOLAR), 231d, 204d),
+            new CO2FactorsData(
+                HeatingType.CONDENSING_BOILER_SOLAR_HEAT_RECOVERY,
+                getStartEmissions(HeatingType.CONDENSING_BOILER_SOLAR_HEAT_RECOVERY), 231d, 204d),
+            new CO2FactorsData(
+                HeatingType.DISTRICT_HEAT,
+                getStartEmissions(HeatingType.DISTRICT_HEAT), 125d, 109d),
+            new CO2FactorsData(
+                HeatingType.DISTRICT_HEAT_HEAT_RECOVERY,
+                getStartEmissions(HeatingType.DISTRICT_HEAT_HEAT_RECOVERY), 125d, 109d),
+            new CO2FactorsData(
+                HeatingType.HEAT_PUMP_HEAT_RECOVERY,
+                getStartEmissions(HeatingType.HEAT_PUMP_HEAT_RECOVERY), 550d, 495d),
+            new CO2FactorsData(
+                HeatingType.LOW_TEMPERATURE_BOILER,
+                getStartEmissions(HeatingType.LOW_TEMPERATURE_BOILER), 231d, 204d),
+            new CO2FactorsData(
+                HeatingType.PELLETS,
+                getStartEmissions(HeatingType.PELLETS),
+                energyFactorsDAO.findBy(HeatingType.PELLETS).getCo2(), 18d),
+            new CO2FactorsData(
+                HeatingType.PELLETS_SOLAR_HEAT_RECOVERY,
+                getStartEmissions(HeatingType.PELLETS_SOLAR_HEAT_RECOVERY), 18d, 18d)
         );
+    }
+
+    /**
+     * @param type HeatingType
+     * @return starting CO2 Emissions Factor for given heating type
+     */
+    private Double getStartEmissions(HeatingType type) {
+        return energyFactorsDAO.findBy(type).getCo2();
     }
 
     /**
@@ -276,8 +315,8 @@ public class InitialParametersController {
                     Integer year = Integer.parseInt(text);
                     if (year > 2100) {
                         globalUntil.setText("2100");
-                    } else if (year < 2018) {
-                        globalUntil.setText("2018");
+                    } else if (year < 2019) { // @TODO: grab start year dynamically
+                        globalUntil.setText("2019");
                     }
                 } catch (NumberFormatException e) {
                     globalUntil.setText("2050");

@@ -1,20 +1,24 @@
 package de.hawhh.gewiss.get.core.calc;
 
+import de.hawhh.gewiss.get.core.input.CO2FactorsData;
+import de.hawhh.gewiss.get.core.input.InputValidationException;
 import de.hawhh.gewiss.get.core.model.*;
 import de.hawhh.gewiss.get.simulator.db.dao.*;
 import org.apache.commons.collections4.map.MultiKeyMap;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Helper class (singleton) for different energy based calculations (like heat demand, co2 emission). It uses maps to
- * cache the values in the database to significally speed up the look up operations.
+ * cache the values in the database to significantly speed up the look up operations.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class EnergyCalculator {
+    private final static Logger LOGGER = Logger.getLogger(EnergyCalculator.class.getName());
+    private static Boolean hasCO2YearlyRates = false; //@TODO: check if good practice or simply if(... != null) ?
     private static final EnergyCalculator ourInstance = new EnergyCalculator();
 
     /**
@@ -65,7 +69,7 @@ public class EnergyCalculator {
     }
 
     /**
-     * Calc the heat demand for the given {@link Building} using the {@link HeatDemandLoadGenerationDAO}.
+     * Calculate the heat demand for the given {@link Building} using the {@link HeatDemandLoadGenerationDAO}.
      * @param building
      * @return
      */
@@ -96,26 +100,132 @@ public class EnergyCalculator {
     }
 
     /**
-     * Calc the co2 emission in g for the given {@link Building} using the {@link PrimaryEnergyFactorsDAO} and {@link HeatDemandFinalEnergyDAO}.
-     * @param building
-     * @return
+     * Prepare and store the yearly CO2 data in the primaryEnergyFactorsMap based on {@link HeatingType}.
+     *
+     * @param co2FactorsData
+     * @throws InputValidationException
      */
-    //@TODO: create an overloaded method  with calcCO2Emission(Building building, int year)
-    // use original method calcCO2Emission(Bulding building) if decreasing CO2 not requested or if first year(?)
-    // Be careful with edge cases: initial year vs DB data; final year sim vs final year CO2
+    public void prepCO2YearlyRates(List<CO2FactorsData> co2FactorsData) throws InputValidationException {
+        LOGGER.log(Level.INFO, "Preparing yearly CO2 Emission Rates ");
+        try {
+            for (CO2FactorsData data: co2FactorsData) {
+                linInterpolation(data);
+            }
+            hasCO2YearlyRates = true;
+        } catch (NullPointerException e) {
+            throw new InputValidationException((e.getMessage()));
+        }
+
+    }
+
+    /**
+     * Linear interpolation method that creates CO2 yearly emissions for two data ranges:
+     * 2019 (start) - 2030; 2030 - 2050 (end) [NB: hardcoded at first, @TODO: make flexible]
+     * based on given values for the start, mid and final year (present in CO2Factors data)
+     *
+     * @param data CO2FactorsData for a given {@link HeatingType}
+     */
+    private void linInterpolation(CO2FactorsData data) {
+        Map<Integer, Double> yearlyCO2Rates = new HashMap<>();; // local map
+        HeatingType type = data.getHeatingSystem();
+        Integer year, steps;
+        Double tempEmission;
+        Double startEmissions = data.getStartEmissions();
+        Double midEmissions = data.getMidEmissions();
+        Double finalEmissions = data.getFinalEmissions();
+
+        // first interval: start year to mid year
+        year = 2019;
+        steps = 2030 - year;
+        // *less-than* comparison: only up to midYear (included second interval loop)
+        for (int step = 0; step < steps; step++) {
+            tempEmission = startEmissions + step * (midEmissions - startEmissions) / steps;
+            yearlyCO2Rates.put(year, tempEmission);
+            LOGGER.log(Level.INFO, "{0} CO2 emissions {1} for year {2}", new Object[] {type, tempEmission, year});
+            year++;
+        }
+
+        // second interval: mid year to final year
+        // year = 2030; final value for year is 2030 (post-increment from first for loop)
+        steps = 2050 - year;
+        for (int step = 0; step <= steps; step++) {
+            tempEmission = midEmissions + step * (finalEmissions - midEmissions) / steps;
+            yearlyCO2Rates.put(year, tempEmission);
+            LOGGER.log(Level.INFO, "{0} CO2 emissions {1} for year {2}", new Object[] {type, tempEmission, year});
+            year++;
+        }
+
+        this.primaryEnergyFactorsMap.get(type).setYearlyCO2Emissions(yearlyCO2Rates);
+        LOGGER.log(Level.INFO, "Finished setting yearlyCO2Rates in primaryEnergyFactorsMap for {0}", type);
+    }
+
+    /**
+     * Calculate the CO2 Emissions based on the given year after linear interpolation has finished.
+     * If CO2 yearly rates do NOT exist or year before range, use overloaded method with base CO2 data from DB.
+     *
+     * @param building
+     * @param year year for the CO2 Yearly Data
+     * @return calculated CO2 emissions for given year (and {@link HeatingType } for specific {@link Building})
+     */
+    public Double calcCO2Emission(Building building, Integer year) {
+        Double co2Emission = 0d;
+
+        if (!hasCO2YearlyRates || year < 2019) {
+            LOGGER.log(Level.INFO, "Yearly CO2 does NOT exist or year before data range: proceeding using base CO2 Emissions form DB");
+            return calcCO2Emission(building);
+        } else {
+            // If year exceeds data range: all calculations will be based on finalYear
+            if (year > 2050) {
+                // LOGGER.log(Level.INFO, "Year exceeds data range: all calculations will be based on finalYear {0}", 2050);
+                year = 2050;
+            }
+
+            if (building.getResidentialType() != null) {
+                Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCO2DataForYear(year);
+                HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
+                    building.getResidentialType(), building.getRenovationLevel(), building.getHeatingType()
+                );
+                Double finalEnergy = heatDemandFinalEnergy.getFinalEnergy();
+                co2Emission += (co2 * finalEnergy * building.getResidentialFloorSpace());
+            }
+
+            if (building.getNonResidentialType() != null) {
+                Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCO2DataForYear(year);
+                HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
+                    building.getNonResidentialType(), building.getRenovationLevel(), building.getHeatingType()
+                );
+                Double finalEnergy = heatDemandFinalEnergy.getFinalEnergy();
+                co2Emission += (co2 * finalEnergy * building.getNonResidentialFloorSpace());
+            }
+        }
+
+        return co2Emission;
+    }
+
+    /**
+     * Calculate the co2 emission in g for the given {@link Building}
+     * using the {@link PrimaryEnergyFactorsDAO} and {@link HeatDemandFinalEnergyDAO}.
+     *
+     * @param building
+     * @return calculated CO2 emissions for {@link HeatingType } from specific {@link Building}
+     */
     public Double calcCO2Emission(Building building) {
         Double co2Emission = 0d;
 
         if (building.getResidentialType() != null) {
             Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCo2();
-            HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(building.getResidentialType(), building.getRenovationLevel(), building.getHeatingType());
+            HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
+                building.getResidentialType(), building.getRenovationLevel(), building.getHeatingType()
+            );
             Double finalEnergy = heatDemandFinalEnergy.getFinalEnergy();
             co2Emission += (co2 * finalEnergy * building.getResidentialFloorSpace());
         }
 
         if (building.getNonResidentialType() != null) {
             Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCo2();
-            HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(building.getNonResidentialType(), building.getRenovationLevel(), building.getHeatingType());
+            HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
+                building.getNonResidentialType(), building.getRenovationLevel(), building.getHeatingType()
+            );
             Double finalEnergy = heatDemandFinalEnergy.getFinalEnergy();
             co2Emission += (co2 * finalEnergy * building.getNonResidentialFloorSpace());
         }
@@ -124,7 +234,7 @@ public class EnergyCalculator {
     }
 
     /**
-     * Calc the building shell renovation costs using the {@link CostsBuildingShellDAO}.
+     * Calculate the building shell renovation costs using the {@link CostsBuildingShellDAO}.
      * @param building
      * @return
      */
@@ -145,7 +255,8 @@ public class EnergyCalculator {
     }
 
     /**
-     * Calc the heat load for the given {@link Building} using the {@link HeatDemandLoadGenerationDAO}.
+     * Calculate the heat load for the given {@link Building} using the {@link HeatDemandLoadGenerationDAO}.
+     *
      * @param building
      * @return
      */
@@ -177,6 +288,7 @@ public class EnergyCalculator {
 
     /**
      * Calc the heating exchange renovation costs for the given {@link Building} using the {@link CostsHeatingSystemDAO}.
+     *
      * @param building
      * @return
      */

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
+import de.hawhh.gewiss.get.core.input.CO2FactorsData;
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
 import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.input.SimulationParameter;
@@ -285,7 +286,9 @@ public class InputController implements Observer {
                         modifiers.add(mc.getModifier());
                     }
                 });
-                SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers);
+                List<CO2FactorsData> yearlyCO2Data = initialParametersController.getCO2FactorTableData();
+
+                SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers, yearlyCO2Data);
 
                 // Ranking/scoring methods
                 List<ScoringMethod> scoringMethods = new ArrayList<>();

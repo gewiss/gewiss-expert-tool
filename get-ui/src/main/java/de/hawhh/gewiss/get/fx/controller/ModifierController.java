@@ -471,7 +471,7 @@ public class ModifierController {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error during Duplication of Modifier");
             alert.setHeaderText("Modifier Duplication Error");
-            alert.setContentText("An error occured during modifier duplication. Please check if the required fields (duration) are filled out and if the other text fields are filled with meaningful input.");
+            alert.setContentText("An error occurred during modifier duplication. Please check if the required fields (duration) are filled out and if the other text fields are filled with meaningful input.");
 
             alert.showAndWait();
         }

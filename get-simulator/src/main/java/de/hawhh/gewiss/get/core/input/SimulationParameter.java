@@ -14,9 +14,10 @@ public class SimulationParameter {
 
     public static final int FIRST_YEAR = 2019; //@TODO: maybe grab from new DB field (discuss with Team Peters)?
 
+    private String name;
     private Integer stopYear;
     private List<Modifier> modifiers = new ArrayList<>();
-    private String name;
+    private List<CO2FactorsData> yearlyCO2Factors = new ArrayList<>();
 
     /**
      * Constructor setting all simulation parameter.
@@ -25,10 +26,11 @@ public class SimulationParameter {
      * @param stopYear the simulation stop year (inclusive)
      * @param modifiers
      */
-    public SimulationParameter(String name, Integer stopYear, List<Modifier> modifiers) {
+    public SimulationParameter(String name, Integer stopYear, List<Modifier> modifiers, List<CO2FactorsData> yearlyCO2Factors) {
+        this.name = name;
         this.stopYear = stopYear;
         this.modifiers = modifiers;
-        this.name = name;
+        this.yearlyCO2Factors = yearlyCO2Factors;
     }
 
     /**
@@ -43,6 +45,16 @@ public class SimulationParameter {
      */
     public int getSimDuration() {
         return stopYear - FIRST_YEAR + 1;
+    }
+
+    /**
+     * @return a boolean whether yearly CO2 factors data is present
+     */
+    public Boolean hasCO2FactorsData() {
+        if(yearlyCO2Factors != null && !yearlyCO2Factors.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     /**

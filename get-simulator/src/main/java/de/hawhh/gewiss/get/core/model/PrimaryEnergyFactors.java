@@ -1,6 +1,7 @@
 package de.hawhh.gewiss.get.core.model;
 
 import lombok.Data;
+import java.util.Map;
 
 @Data
 public class PrimaryEnergyFactors {
@@ -9,4 +10,9 @@ public class PrimaryEnergyFactors {
     private EnergySourceType energySourceType;
     private Double primaryEnergyFactor;
     private Double co2;
+    private Map<Integer, Double> yearlyCO2Emissions; // <year, CO2_emissions>
+
+    public Double getCO2DataForYear(Integer year) {
+        return yearlyCO2Emissions.get(year);
+    }
 }

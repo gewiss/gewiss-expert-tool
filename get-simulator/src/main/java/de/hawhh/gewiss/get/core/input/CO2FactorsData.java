@@ -1,18 +1,18 @@
 package de.hawhh.gewiss.get.core.input;
 
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.PrimaryEnergyFactors;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
-import java.util.logging.Logger;
 
 /**
- * Data model class for Co2 Emission table.. @TODO: better description.
+ * Data model class for Co2 Emission Data per {@link HeatingType} with starting, mid-range and final emission rates.
+ * A list of CO2FactorsData objects is used to fill the yearlyCO2Emissions map in {@link PrimaryEnergyFactors}
+ * using linear interpolation.
  *
  * @author Antony Sotirov
  */
 public class CO2FactorsData {
-
-    private final static Logger LOGGER = Logger.getLogger(CO2FactorsData.class.getName());
 
     private final SimpleStringProperty heatingSystem;
     private final SimpleDoubleProperty startEmissions;
@@ -24,8 +24,6 @@ public class CO2FactorsData {
         this.startEmissions = new SimpleDoubleProperty(startEmissions);
         this.midEmissions = new SimpleDoubleProperty(midEmissions);
         this.finalEmissions = new SimpleDoubleProperty(finalEmissions);
-
-        //@TODO: log here
     }
 
     // heating type (getter and setter based around HeatingType parameters, not strings!)
