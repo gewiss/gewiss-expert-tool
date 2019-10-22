@@ -288,7 +288,8 @@ public class InputController implements Observer {
                 });
                 List<CO2FactorsData> yearlyCO2Data = initialParametersController.getCO2FactorTableData();
 
-                SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers, yearlyCO2Data);
+                SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers, yearlyCO2Data,
+                    InitialParametersController.MID_CO2_YEAR, InitialParametersController.FINAL_CO2_YEAR);
 
                 // Ranking/scoring methods
                 List<ScoringMethod> scoringMethods = new ArrayList<>();

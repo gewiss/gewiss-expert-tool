@@ -2,6 +2,7 @@ package de.hawhh.gewiss.get.core.calc;
 
 import de.hawhh.gewiss.get.core.input.CO2FactorsData;
 import de.hawhh.gewiss.get.core.input.InputValidationException;
+import de.hawhh.gewiss.get.core.input.SimulationParameter;
 import de.hawhh.gewiss.get.core.model.*;
 import de.hawhh.gewiss.get.simulator.db.dao.*;
 import org.apache.commons.collections4.map.MultiKeyMap;
@@ -18,8 +19,10 @@ import java.util.logging.Logger;
  */
 public class EnergyCalculator {
     private final static Logger LOGGER = Logger.getLogger(EnergyCalculator.class.getName());
-    private static Boolean hasCO2YearlyRates = false; //@TODO: check if good practice or simply if(... != null) ?
     private static final EnergyCalculator ourInstance = new EnergyCalculator();
+    private Boolean yearlyCO2RatesInterpolated = false;
+    private Integer midCO2Year = null;
+    private Integer finalCO2Year = null;
 
     /**
      * MultiKeyMap for the heat demand at load generation with building type ({@link String}) and {@link RenovationLevel} as key.
@@ -103,15 +106,17 @@ public class EnergyCalculator {
      * Prepare and store the yearly CO2 data in the primaryEnergyFactorsMap based on {@link HeatingType}.
      *
      * @param co2FactorsData
-     * @throws InputValidationException
+     * @throws de.hawhh.gewiss.get.core.input.InputValidationException
      */
-    public void prepCO2YearlyRates(List<CO2FactorsData> co2FactorsData) throws InputValidationException {
+    public void prepCO2YearlyRates(List<CO2FactorsData> co2FactorsData, Integer midCO2Year, Integer finalCO2Year) throws InputValidationException {
         LOGGER.log(Level.INFO, "Preparing yearly CO2 Emission Rates ");
+        this.midCO2Year = midCO2Year;
+        this.finalCO2Year = finalCO2Year;
         try {
             for (CO2FactorsData data: co2FactorsData) {
-                linInterpolation(data);
+                linInterpolation(data); // can throw NullPointerException
             }
-            hasCO2YearlyRates = true;
+            yearlyCO2RatesInterpolated = true;
         } catch (NullPointerException e) {
             throw new InputValidationException((e.getMessage()));
         }
@@ -120,38 +125,38 @@ public class EnergyCalculator {
 
     /**
      * Linear interpolation method that creates CO2 yearly emissions for two data ranges:
-     * 2019 (start) - 2030; 2030 - 2050 (end) [NB: hardcoded at first, @TODO: make flexible]
-     * based on given values for the start, mid and final year (present in CO2Factors data)
+     * (start) FIRST_YEAR - midCO2Year; midCO2Year - finalCO2Year (end)
+     * based on given CO2 values for the start, mid and final year (present in CO2Factors data)
      *
      * @param data CO2FactorsData for a given {@link HeatingType}
      */
     private void linInterpolation(CO2FactorsData data) {
-        Map<Integer, Double> yearlyCO2Rates = new HashMap<>();; // local map
         HeatingType type = data.getHeatingSystem();
-        Integer year, steps;
-        Double tempEmission;
         Double startEmissions = data.getStartEmissions();
         Double midEmissions = data.getMidEmissions();
         Double finalEmissions = data.getFinalEmissions();
 
+        Map<Integer, Double> yearlyCO2Rates = new HashMap<>();; // local map
+        Double tempEmission;
+        Integer year = SimulationParameter.FIRST_YEAR;
+        Integer numOfSteps;
+
         // first interval: start year to mid year
-        year = 2019;
-        steps = 2030 - year;
-        // *less-than* comparison: only up to midYear (included second interval loop)
-        for (int step = 0; step < steps; step++) {
-            tempEmission = startEmissions + step * (midEmissions - startEmissions) / steps;
+        // *less-than* comparison: only up to midYear (included in second interval loop)
+        numOfSteps = midCO2Year - year;
+        for (int step = 0; step < numOfSteps; step++) {
+            tempEmission = startEmissions + step * (midEmissions - startEmissions) / numOfSteps;
             yearlyCO2Rates.put(year, tempEmission);
-            LOGGER.log(Level.INFO, "{0} CO2 emissions {1} for year {2}", new Object[] {type, tempEmission, year});
+            // LOGGER.log(Level.INFO, "{0} CO2 emissions {1} for year {2}", new Object[] {type, tempEmission, year});
             year++;
         }
 
-        // second interval: mid year to final year
-        // year = 2030; final value for year is 2030 (post-increment from first for loop)
-        steps = 2050 - year;
-        for (int step = 0; step <= steps; step++) {
-            tempEmission = midEmissions + step * (finalEmissions - midEmissions) / steps;
+        // second interval: mid year (*year* variable post-increment from first for loop) to final year
+        numOfSteps = finalCO2Year - year;
+        for (int step = 0; step <= numOfSteps; step++) {
+            tempEmission = midEmissions + step * (finalEmissions - midEmissions) / numOfSteps;
             yearlyCO2Rates.put(year, tempEmission);
-            LOGGER.log(Level.INFO, "{0} CO2 emissions {1} for year {2}", new Object[] {type, tempEmission, year});
+            // LOGGER.log(Level.INFO, "{0} CO2 emissions {1} for year {2}", new Object[] {type, tempEmission, year});
             year++;
         }
 
@@ -169,15 +174,18 @@ public class EnergyCalculator {
      */
     public Double calcCO2Emission(Building building, Integer year) {
         Double co2Emission = 0d;
-
-        if (!hasCO2YearlyRates || year < 2019) {
-            LOGGER.log(Level.INFO, "Yearly CO2 does NOT exist or year before data range: proceeding using base CO2 Emissions form DB");
+        if (!yearlyCO2RatesInterpolated) {
+            LOGGER.log(Level.INFO, "Yearly interpolated CO2 rates not calculated: using base CO2 Emissions from DB instead");
+            return calcCO2Emission(building);
+        }
+        if(year < SimulationParameter.FIRST_YEAR) {
+            LOGGER.log(Level.INFO, "No interpolated CO2 data for year before {0}: using base CO2 Emissions from DB instead", SimulationParameter.FIRST_YEAR);
             return calcCO2Emission(building);
         } else {
             // If year exceeds data range: all calculations will be based on finalYear
-            if (year > 2050) {
+            if (year > finalCO2Year) {
                 // LOGGER.log(Level.INFO, "Year exceeds data range: all calculations will be based on finalYear {0}", 2050);
-                year = 2050;
+                year = finalCO2Year;
             }
 
             if (building.getResidentialType() != null) {
@@ -287,7 +295,7 @@ public class EnergyCalculator {
     }
 
     /**
-     * Calc the heating exchange renovation costs for the given {@link Building} using the {@link CostsHeatingSystemDAO}.
+     * Calculate the heating exchange renovation costs for the given {@link Building} using the {@link CostsHeatingSystemDAO}.
      *
      * @param building
      * @return
@@ -295,6 +303,14 @@ public class EnergyCalculator {
     public Double calcHeatingExchangeRenovationCosts(Building building) {
         Double totalLoad = calcHeatLoad(building);
         return getHeatingExchangeCosts(totalLoad.intValue(), building.getHeatingType());
+    }
+
+    /**
+     * Getter for Boolean yearlyCO2RatesInterpolated.
+     * @return
+     */
+    public Boolean hasYearlyCO2RatesInterpolated() {
+        return yearlyCO2RatesInterpolated;
     }
 
     /**

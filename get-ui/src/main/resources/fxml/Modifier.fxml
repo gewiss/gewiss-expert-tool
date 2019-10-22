@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Text?>
 <?import org.controlsfx.control.CheckTreeView?>
 
-<!--@TODO: fix ordering for better readability-->
+<!--@TODO: (optional) ordering of elements for better readability-->
 <VBox fx:id="modifierPane" alignment="CENTER"
    xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
    fx:controller="de.hawhh.gewiss.get.fx.controller.ModifierController">

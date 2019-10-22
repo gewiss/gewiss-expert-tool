@@ -181,10 +181,10 @@
                     <content>
                         <TableView fx:id="cO2FactorsTable" editable="true" maxWidth="840.0" minWidth="700.0" prefHeight="140.0" prefWidth="790.0">
                             <columns>
-                                <TableColumn fx:id="heatingSystem" editable="false" maxWidth="350.0" minWidth="320.0" prefWidth="280.0" text="Heating System"/>
-                                <TableColumn fx:id="startEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0" text="2019 (current)"/>
-                                <TableColumn fx:id="midEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0" text="2030"/>
-                                <TableColumn fx:id="finalEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0" text="2050"/>
+                                <TableColumn fx:id="heatingSystem" editable="false" maxWidth="350.0" minWidth="320.0" prefWidth="280.0"/>
+                                <TableColumn fx:id="startEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0"/>
+                                <TableColumn fx:id="midEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0"/>
+                                <TableColumn fx:id="finalEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0"/>
                             </columns>
                         </TableView>
                     </content>

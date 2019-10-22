@@ -50,8 +50,8 @@ public class SimulatorTest {
         mod1.setTargetOwnershipTypes(Arrays.asList("PRIVAT", "UNKNOWN"));
         modifiers.add(mod1);
 
-        // @TODO: test with yearlyCO2 as well (and without too!)
-        this.simParams = new SimulationParameter(name, simStop, modifiers, null);
+        // @TODO: update test with yearlyCO2 Interpolated data; expunge calcCO2Emission(Building building) method from EnergyCalculator class; update SimParam validation method
+        this.simParams = new SimulationParameter(name, simStop, modifiers, null, null, null);
 
         this.scoringMethods = new ArrayList<>();
         this.scoringMethods.add(new BuildingAgeFactor());
@@ -79,7 +79,6 @@ public class SimulatorTest {
             e.printStackTrace();
         }
 
-        Assert.assertNotNull(simulationResult);
         Assert.assertNotNull(simulationResult.getBuildings());
         Assert.assertNotNull(simulationResult.getOutput());
         Assert.assertNotNull(simulationResult.getName());

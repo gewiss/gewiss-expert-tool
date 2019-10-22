@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<!-- @TODO: fix all heights-->
+<!-- @TODO: (optional) update heights-->
 <BorderPane fx:id="inputPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1367.0" prefWidth="1436.0" style="-fx-background-color: WhiteSmoke;" stylesheets="@../styles/bootstrap3.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.hawhh.gewiss.get.fx.controller.InputController">
     <top>
         <fx:include fx:id="initialParameters" source="InitialParameters.fxml" BorderPane.alignment="CENTER" />

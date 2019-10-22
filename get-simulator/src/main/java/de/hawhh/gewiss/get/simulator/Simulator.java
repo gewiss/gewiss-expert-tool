@@ -65,7 +65,6 @@ public class Simulator extends Observable {
      */
     public SimulationResult simulate(SimulationParameter parameter, List<ScoringMethod> scoringMethods, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
         long startTime = System.currentTimeMillis();
-        Boolean hasCO2Factors;
 
         // if seed is not explicitly set, use system time in nano second to create new "random" seed for each run.
         if (rgSeed == null) {
@@ -78,11 +77,10 @@ public class Simulator extends Observable {
         // Validate the input factors
         parameter.validate();
 
-        // check if yearly CO2 Factors Data is present and store state
-        hasCO2Factors = parameter.hasCO2FactorsData();
-        // and populate list for linear interpolation
-        if(hasCO2Factors) {
-            this.energyCalculator.prepCO2YearlyRates(parameter.getYearlyCO2Factors());
+        // check if yearly CO2 Factors Data is present and populate list for linear interpolation
+        if(parameter.hasCO2FactorsData()) {
+            this.energyCalculator.prepCO2YearlyRates(
+                parameter.getYearlyCO2Factors(), parameter.getMidCO2Year(), parameter.getFinalCO2Year());
         }
 
         // Fetch the building from the DB
@@ -169,8 +167,8 @@ public class Simulator extends Observable {
                 Double heatDemand = energyCalculator.calcHeatDemand(building);
 
                 Double co2Emission;
-                // if requested: grab CO2 factors: usie calcCO2Emission(building, year) instead of regular method
-                if (hasCO2Factors) {
+                // if requested: grab CO2 factors: use calcCO2Emission(building, year) instead of regular method
+                if (energyCalculator.hasYearlyCO2RatesInterpolated()) {
                     co2Emission = energyCalculator.calcCO2Emission(building, simYear);
                 } else {
                     co2Emission = energyCalculator.calcCO2Emission(building);
@@ -238,8 +236,8 @@ public class Simulator extends Observable {
         //mod1.setTargetBuildingsTypes(Arrays.asList("EFH_C", "EFH_I", "EFH_B", "EFH_G", "EFH_A", "EFH_F", "EFH_J", "EFH_K", "EFH_L", "EFH_H", "EFH_E", "EFH_D"));
         //modifiers.add(mod1);
 
-        // yearlyCO2Factors == null: use constant CO2 factors data instead
-        SimulationParameter parameter = new SimulationParameter(name, simStop, modifiers, null);
+        // yearlyCO2Factors, midYearCO2, finalYearCO2 == null: use constant CO2 factors data instead
+        SimulationParameter parameter = new SimulationParameter(name, simStop, modifiers, null, null, null);
 
         // Add special support for Guava (Google) datatype for Jackson
         //ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());
