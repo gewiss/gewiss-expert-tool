@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * Data model class for Co2 Emission Data per {@link HeatingType} with starting, mid-range and final emission rates.
+ * Data model class for CO2 Emission Data per {@link HeatingType} with starting, mid-range and final emission rates.
  * A list of CO2FactorsData objects is used to fill the yearlyCO2Emissions map in {@link PrimaryEnergyFactors}
  * using linear interpolation.
  *

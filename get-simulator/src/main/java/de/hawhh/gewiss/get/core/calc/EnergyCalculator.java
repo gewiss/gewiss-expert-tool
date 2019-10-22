@@ -221,7 +221,7 @@ public class EnergyCalculator {
         Double co2Emission = 0d;
 
         if (building.getResidentialType() != null) {
-            Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCo2();
+            Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCo2Start();
             HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
                 building.getResidentialType(), building.getRenovationLevel(), building.getHeatingType()
             );
@@ -230,7 +230,7 @@ public class EnergyCalculator {
         }
 
         if (building.getNonResidentialType() != null) {
-            Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCo2();
+            Double co2 = primaryEnergyFactorsMap.get(building.getHeatingType()).getCo2Start();
             HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
                 building.getNonResidentialType(), building.getRenovationLevel(), building.getHeatingType()
             );
