@@ -6,6 +6,7 @@ import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.input.SimulationParameter;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.RenovationType;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
 import de.hawhh.gewiss.get.simulator.renovation.IRenovationStrategy;
@@ -58,9 +59,9 @@ public class SimulatorTest {
         this.scoringMethods.add(new CO2EmissionFactor());
         this.scoringMethods.add(new CO2EmissionSquareMeterFactor());
 
-        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
         List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2));
 

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * house renovation can also be defined. The strategy performs a random check against this rate and based on the outcome decides whether the building is renovated to the
  * basic or the good renovation level.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
 
@@ -28,6 +28,7 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
 
     private final Double renovationRate;
     private final Double passiveHouseRate;
+    // @TODO: make 4 different maps, do not put in one list, becomes cumbersome to read
     private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses;
 
     /**
@@ -40,7 +41,8 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     public RenovationHeatExchangeRateStrategy(Double renovationRate, Double passiveHouseRate, List<HeatingSystemExchangeRate> heatingSystemExchangeRates) {
         this.renovationRate = renovationRate;
         this.passiveHouseRate = passiveHouseRate;
-        
+
+        // loop over list of lists and create the 4 different classes based on renType
         createHeatingExchangeClasses(heatingSystemExchangeRates);
 
         LOGGER.log(Level.INFO, "Initialized RenovationRateStrategy with a renovationRate of {0}% and a passive house renovation chance of {1}%", new Object[]{renovationRate, passiveHouseRate});
@@ -53,7 +55,7 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
         long noRenovatedBuildings = (long) (scoredBuildings.size() * (renovationRate / 100d));
         // Limit the stream of scored buildings so that only renovate rate percentage buildings are selected for a renovation
         scoredBuildings.stream().limit(noRenovatedBuildings).forEachOrdered(sb -> {
-            //LOGGER.log(Level.INFO, "Renvating building {0}\twith score {1}", new Object[]{sb.getBuilding().getAlkisID(), sb.getScore()});
+            //LOGGER.log(Level.INFO, "Renovating building {0}\twith score {1}", new Object[]{sb.getBuilding().getAlkisID(), sb.getScore()});
             Building building = sb.getBuilding();
 
             // renovation of the building hull
@@ -69,6 +71,9 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
             }
             
             // renovation/exchange of heating system
+            // @TODO: add to if / else if checks above and select the appropriate heating exchange class based on that
+            // create a separate private method for the for loop, with building and heatingExchange classes as params
+            // if residential + non_residential : treat as residential (explain in readme.MD)
             for (HeatingType heatingType : this.heatingExchangeClasses.keySet()) {
                 if (heatingType.equals(building.getHeatingType())) {
                    Double coinToss = pseudoRandomGenerator.nextDouble() * 100;
@@ -86,6 +91,7 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     }
 
     private void createHeatingExchangeClasses(List<HeatingSystemExchangeRate> heatingSystemExchangeRates) {
+        // @TODO: based on new input param, switch statement for different HashMaps
         this.heatingExchangeClasses = new HashMap<>();
        
         heatingSystemExchangeRates.forEach((exchangeRate) -> {
