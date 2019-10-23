@@ -1,5 +1,5 @@
 # GET (GEWISS Expert Tool)
-The GEWISS Expert Tool (GET) is a simulation tool developed by [Thomas Preisler](mailto:thomas.preisler@haw-hamburg.de) and [Nils Weiss](mailto:nils.weiss@haw-hamburg.de) from the [HAW Hamburg](https://www.haw-hamburg.de) as part of the name giving [GEWISS](http://gewiss.haw-hamburg.de/) Project. The data model as well as the actual data is provided by  [Ivan Dochev](mailto:ivan.dochev@hcu-hamburg.de) from the [HCU Hamburg](https://www.hcu-hamburg.de/). Additional contributers are [Arjun Jamil](mailto:arjun.jamil@haw-hamburg.de) (HAW Hamburg, simulation logic and UI/UX design), Ev Köhler (HAW Hamburg, simulation logic) and [Hannes Seller](mailto:hannes.seller@hcu-hamburg.de) (HCU Hamburg, simulation logic). The project is lead by [Wolfgang Renz](mailto:wolfgang.renz@haw-hamburg.de) (HAW Hamburg) and [Irene Peters](mailto:irene.peters@hcu-hamburg.de) (HCU Hamburg).
+The GEWISS Expert Tool (GET) is a simulation tool developed by [Thomas Preisler](mailto:thomas.preisler@haw-hamburg.de), [Nils Weiss](mailto:nils.weiss@haw-hamburg.de) and [Antony Sotirov](mailto:antony.sotirov@haw-hamburg.de) from the [HAW Hamburg](https://www.haw-hamburg.de) as part of the name giving [GEWISS](http://gewiss.haw-hamburg.de/) Project. The data model as well as the actual data is provided by  [Ivan Dochev](mailto:ivan.dochev@hcu-hamburg.de) from the [HCU Hamburg](https://www.hcu-hamburg.de/). Additional contributers are [Arjun Jamil](mailto:arjun.jamil@haw-hamburg.de) (HAW Hamburg, simulation logic and UI/UX design), Ev Köhler (HAW Hamburg, simulation logic) and [Hannes Seller](mailto:hannes.seller@hcu-hamburg.de) (HCU Hamburg, simulation logic). The project is lead by [Wolfgang Renz](mailto:wolfgang.renz@haw-hamburg.de) (HAW Hamburg) and [Irene Peters](mailto:irene.peters@hcu-hamburg.de) (HCU Hamburg).
 
 The GET-Icon is made by [Freepik](www.freepik.com) from www.flaticon.com.
 
@@ -86,17 +86,19 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | id               | Integer   | Unique table id |
 | BUILD_TYPE       | String    | Building type |
 | RENOVATION_LEVEL | Integer   | 0,1,2 for baseline, EnEV 2014, Passive house |
-| HEATING_SYSTEM   | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| HEATING_SYSTEM   | String    | type of heating system, e.g. "DISTRICT HEATING" |
 | FINAL_ENERGY     | Double    | Demand for space heating and domestic hot water as final energy (kWh/m<sup>2</sup>) |
 
 #### Table primary_energy_factors
 | Column Name               | Type      | Description |
 |-------------------------- |---------- |-------------|
 | id                        | Integer   | Unique table id |
-| HEATING_SYSTEM            | String    | type of heating system, f.ex "DISTRICT HEATING" |
-| ENERGY_SOURCE_TYPE        | String    | type of energy source, f.ex "NATURAL_GAS", used only for information |
+| HEATING_SYSTEM            | String    | type of heating system, e.g. "DISTRICT HEATING" |
+| ENERGY_SOURCE_TYPE        | String    | type of energy source, e.g. "NATURAL_GAS", used only for information |
 | PRIMARY_ENERGY_FACTOR     | Double    | Primary energy factor of the heating system type (ratio) |
-| CO2                       | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>|
+| CO2_2019                  | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>) for 2019 (current) |
+| CO2_2030                  | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>), projection for 2030 |
+| CO2_2050                  | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>), projection for 2050 |
 
 #### Table costs_building_shell
 | Column Name   | Type      | Description |
@@ -110,8 +112,8 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | Column Name   | Type      | Description |
 |-------------  |---------- |-------------|
 | id               | Integer   | Unique table id |
-| HEAT_LOAD_kW     | Integer   | The peak heat load needed, f.ex. 5, 15, 25 kW   |
-| HEATING_SYSTEM   | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| HEAT_LOAD_kW     | Integer   | The peak heat load needed, e.g. 5, 15, 25 kW   |
+| HEATING_SYSTEM   | String    | type of heating system, e.g. "DISTRICT HEATING" |
 | COST             | Double    | total cost (euro) for exchanging the old heating system with this system |
 
 ## Building and Running the Application
