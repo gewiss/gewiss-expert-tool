@@ -5,7 +5,7 @@ import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
 
 /**
- * Score a building according to it's CO2 emission.
+ * Score a building according to its CO2 emission.
  *
  * @author Thomas Preisler
  */

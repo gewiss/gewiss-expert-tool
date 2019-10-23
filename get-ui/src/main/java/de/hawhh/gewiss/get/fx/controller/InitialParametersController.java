@@ -1,7 +1,10 @@
 package de.hawhh.gewiss.get.fx.controller;
 
+import de.hawhh.gewiss.get.core.input.CO2FactorsData;
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
+import de.hawhh.gewiss.get.core.input.SimulationParameter;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.simulator.db.dao.PrimaryEnergyFactorsDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,7 +16,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
 import org.controlsfx.control.CheckComboBox;
-
 import java.util.List;
 
 /**
@@ -26,6 +28,11 @@ public class InitialParametersController {
     public static final String BUILDING_AGE = "Building Age/Last Renovation";
     public static final String CO2_EMISSION = "CO2 Emission";
     public static final String CO2_EMISSION_SQUARE_METER = "CO2 Emission (m^2)";
+    //@TODO: (optional) FIRST_YEAR -> grab from sqlite DB (get-simulator) or set in UI (get-ui)?
+    public static final Integer START_CO2_YEAR = SimulationParameter.FIRST_YEAR;
+    public static final Integer MID_CO2_YEAR = 2030;
+    public static final Integer FINAL_CO2_YEAR = 2050;
+    private PrimaryEnergyFactorsDAO energyFactorsDAO;
 
     // Initial simulation parameters
     @FXML
@@ -40,7 +47,6 @@ public class InitialParametersController {
     private TextField globalSeed;
     @FXML
     private CheckComboBox<String> rankingMethods;
-
     // Heating System Exchange Table
     @FXML
     private TableView<HeatingSystemExchangeRate> heatingSystemExchangeTable;
@@ -64,6 +70,17 @@ public class InitialParametersController {
     private TableColumn<HeatingSystemExchangeRate, Double> districtHeatHRRate;
     @FXML
     private TableColumn<HeatingSystemExchangeRate, Double> condBoilerSolarHRRate;
+    // Co2 Emissions Factors Table
+    @FXML
+    private TableView<CO2FactorsData> cO2FactorsTable;
+    @FXML
+    private TableColumn<CO2FactorsData, String> heatingSystem;
+    @FXML
+    private TableColumn<CO2FactorsData, Double> startEmissions;
+    @FXML
+    private TableColumn<CO2FactorsData, Double> midEmissions;
+    @FXML
+    private TableColumn<CO2FactorsData, Double> finalEmissions;
 
     /**
      * Initializes the heating system exchanges table and connects the view to the underlying data model.
@@ -184,6 +201,61 @@ public class InitialParametersController {
         heatingSystemExchangeTable.setEditable(true);
     }
 
+
+    /**
+     * Initializes the CO2 Factors Data table and connects the view to the underlying data model.
+     */
+    private void initCO2FactorsTable() {
+        // instantiate energyFactorsDAO, needed to get start year CO2 Factors
+        energyFactorsDAO = new PrimaryEnergyFactorsDAO();
+
+        // Define the connection between data model and table columns
+        heatingSystem.setCellValueFactory(new PropertyValueFactory<>("heatingSystem"));
+        heatingSystem.setText("Heating System");
+
+        startEmissions.setCellValueFactory(new PropertyValueFactory<>("startEmissions"));
+        startEmissions.setText(START_CO2_YEAR.toString() + " (current)");
+        startEmissions.setEditable(true);
+        startEmissions.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        startEmissions.setOnEditCommit((TableColumn.CellEditEvent<CO2FactorsData, Double> event) -> {
+            TablePosition<CO2FactorsData, Double> pos = event.getTablePosition();
+            Double newValue = event.getNewValue();
+
+            int row = pos.getRow();
+            CO2FactorsData hser = event.getTableView().getItems().get(row);
+            hser.setStartEmissions(newValue);
+        });
+
+        midEmissions.setCellValueFactory(new PropertyValueFactory<>("midEmissions"));
+        midEmissions.setText(MID_CO2_YEAR.toString());
+        midEmissions.setEditable(true);
+        midEmissions.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        midEmissions.setOnEditCommit((TableColumn.CellEditEvent<CO2FactorsData, Double> event) -> {
+            TablePosition<CO2FactorsData, Double> pos = event.getTablePosition();
+            Double newValue = event.getNewValue();
+
+            int row = pos.getRow();
+            CO2FactorsData hser = event.getTableView().getItems().get(row);
+            hser.setMidEmissions(newValue);
+        });
+
+        finalEmissions.setCellValueFactory(new PropertyValueFactory<>("finalEmissions"));
+        finalEmissions.setText(FINAL_CO2_YEAR.toString());
+        finalEmissions.setEditable(true);
+        finalEmissions.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        finalEmissions.setOnEditCommit((TableColumn.CellEditEvent<CO2FactorsData, Double> event) -> {
+            TablePosition<CO2FactorsData, Double> pos = event.getTablePosition();
+            Double newValue = event.getNewValue();
+
+            int row = pos.getRow();
+            CO2FactorsData hser = event.getTableView().getItems().get(row);
+            hser.setFinalEmissions(newValue);
+        });
+
+        cO2FactorsTable.setItems(getCO2FactorsDataList());
+        cO2FactorsTable.setEditable(true);
+    }
+
     /**
      * Creates and returns the default list for {@link HeatingSystemExchangeRate}s.
      */
@@ -193,6 +265,24 @@ public class InitialParametersController {
                 new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
                 new HeatingSystemExchangeRate(HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0)
         );
+    }
+
+    /**
+     * Creates and returns the default list for {@link CO2FactorsData}.
+     */
+    private ObservableList<CO2FactorsData> getCO2FactorsDataList() {
+        ObservableList<CO2FactorsData> co2FactorsDataList = FXCollections.observableArrayList();
+
+        for (HeatingType type: HeatingType.values()) {
+            co2FactorsDataList.add(new CO2FactorsData(
+                type,
+                energyFactorsDAO.findBy(type).getCo2Start(),
+                energyFactorsDAO.findBy(type).getCo2Mid(),
+                energyFactorsDAO.findBy(type).getCo2Final()
+            ));
+        }
+
+        return co2FactorsDataList;
     }
 
     /**
@@ -206,8 +296,8 @@ public class InitialParametersController {
                     Integer year = Integer.parseInt(text);
                     if (year > 2100) {
                         globalUntil.setText("2100");
-                    } else if (year < 2018) {
-                        globalUntil.setText("2018");
+                    } else if (year < SimulationParameter.FIRST_YEAR) {
+                        globalUntil.setText(SimulationParameter.FIRST_YEAR.toString());
                     }
                 } catch (NumberFormatException e) {
                     globalUntil.setText("2050");
@@ -274,6 +364,7 @@ public class InitialParametersController {
      */
     public void init() {
         initHeatExchangeTable();
+        initCO2FactorsTable();
         initTextFieldValidators();
         
         rankingMethods.getItems().addAll(BUILDING_AGE, CO2_EMISSION, CO2_EMISSION_SQUARE_METER);
@@ -298,6 +389,10 @@ public class InitialParametersController {
     
     public List<HeatingSystemExchangeRate> getHeatingSystemExchangeRates() {
         return heatingSystemExchangeTable.getItems();
+    }
+
+    public List<CO2FactorsData> getCO2FactorTableData() {
+        return cO2FactorsTable.getItems();
     }
 
     /**

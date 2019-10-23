@@ -1,7 +1,7 @@
 package de.hawhh.gewiss.get.simulator.db.dao;
 
 import de.hawhh.gewiss.get.core.model.HeatingType;
-import de.hawhh.gewiss.get.core.model.PrimaryEnergyFactor;
+import de.hawhh.gewiss.get.core.model.PrimaryEnergyFactors;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ public class PrimaryEnergyFactorsDAOTest {
 
     @Test
     public void findAll() {
-        Map<HeatingType, PrimaryEnergyFactor> results = dao.findAll();
+        Map<HeatingType, PrimaryEnergyFactors> results = dao.findAll();
 
         assertNotNull(results);
         assertFalse(results.isEmpty());
@@ -29,7 +29,7 @@ public class PrimaryEnergyFactorsDAOTest {
 
     @Test
     public void findBy() {
-        PrimaryEnergyFactor pef = dao.findBy(HeatingType.CONDENSING_BOILER);
+        PrimaryEnergyFactors pef = dao.findBy(HeatingType.CONDENSING_BOILER);
         assertNotNull(pef);
     }
 }

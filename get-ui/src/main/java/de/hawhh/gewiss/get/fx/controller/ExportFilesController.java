@@ -59,7 +59,7 @@ public class ExportFilesController {
         if (result != null) {
             Stage stage = (Stage) exportFilesPane.getScene().getWindow();
             final FileChooser fileChooser = new FileChooser();
-            // @TODO: clicking 'cancel' should stop the file export
+            // @TODO: (optional) clicking 'cancel' should stop the file export
             if (excelRadio.isSelected()) {
                 fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Microsoft Excel Open XML Format  (*.xlsx)", "*.xlsx"));
                 fileChooser.setInitialFileName("simulation-results_" + result.getSeed().toString());

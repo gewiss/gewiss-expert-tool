@@ -17,8 +17,11 @@
 <?import javafx.scene.text.Text?>
 <?import org.controlsfx.control.CheckTreeView?>
 
-<!--@TODO: fix ordering for better readability-->
-<VBox fx:id="modifierPane" alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.hawhh.gewiss.get.fx.controller.ModifierController">
+<!--@TODO: (optional) ordering of elements for better readability-->
+<VBox fx:id="modifierPane" alignment="CENTER"
+   xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
+   fx:controller="de.hawhh.gewiss.get.fx.controller.ModifierController">
+
    <children>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="790.0" prefWidth="920.0" style="-fx-background-color: WhiteSmoke;" stylesheets="@../styles/bootstrap3.css">
          <right>
@@ -95,24 +98,6 @@
                               </HBox>
                               <Label text="Building Type:" GridPane.rowIndex="2" />
                               <Label text="Ownership:" GridPane.rowIndex="3" />
-                              <!--Deprecated-->
-                              <!--<HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                 <children>
-                                    <CheckBox fx:id="ownershipPrivate" disable="true" mnemonicParsing="false" text="Private">
-                                       <HBox.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </HBox.margin>
-                                    </CheckBox>
-                                    <CheckBox fx:id="ownershipPublic" disable="true" mnemonicParsing="false" text="Public">
-                                       <HBox.margin>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </HBox.margin>
-                                    </CheckBox>
-                                 </children>
-                                 <GridPane.margin>
-                                    <Insets />
-                                 </GridPane.margin>
-                              </HBox>-->
                               <Label text="Renovation Level:" GridPane.rowIndex="4" />
                               <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                                  <children>
