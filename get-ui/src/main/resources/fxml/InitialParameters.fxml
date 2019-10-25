@@ -175,7 +175,7 @@
                     <content>
                         <TableView fx:id="heatingSystemExchangeTable" editable="true" maxWidth="1630.0" minWidth="1227.0" prefWidth="1369.0">
                             <columns>
-                                <TableColumn fx:id="renType" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Renovation Type"/>
+                                <TableColumn fx:id="renType" editable="false" maxWidth="150.0" minWidth="130.0" prefWidth="200.0" text="Renovation Type"/>
                                 <TableColumn fx:id="oldType" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Old\New"/>
                                 <TableColumn fx:id="lowTempBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Low Temp Boiler"/>
                                 <TableColumn fx:id="districtHeatRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat"/>
