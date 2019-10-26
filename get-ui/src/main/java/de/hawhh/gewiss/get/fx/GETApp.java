@@ -28,7 +28,7 @@ public class GETApp extends Application {
         //scene.getStylesheets().add("/styles/Styles.css");
         //scene.getStylesheets().add("/styles/bootstrap3.css");
         
-        stage.setTitle("GEWISS Expert Tool (GET v0.3.5)");
+        stage.setTitle("GEWISS Expert Tool (GET v0.3.7)");
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icon/cityscape.png")));
         
         stage.setScene(scene);

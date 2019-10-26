@@ -6,6 +6,7 @@ import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.input.SimulationParameter;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.RenovationType;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
 import de.hawhh.gewiss.get.simulator.renovation.IRenovationStrategy;
@@ -58,11 +59,23 @@ public class SimulatorTest {
         this.scoringMethods.add(new CO2EmissionFactor());
         this.scoringMethods.add(new CO2EmissionSquareMeterFactor());
 
-        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2));
+        HeatingSystemExchangeRate rate3 = new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate4 = new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate5 = new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate6 = new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate7 = new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate8 = new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2, rate3, rate4, rate5, rate6, rate7, rate8));
 
         this.renovationStrategy = new RenovationHeatExchangeRateStrategy(2.0, 0.0, rates);
 

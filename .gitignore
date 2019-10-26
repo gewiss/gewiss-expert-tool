@@ -915,3 +915,9 @@
 /get-ui/target/get-ui-0.3.5.jar
 /get-ui/target/jfx/app/get-ui-0.3.5-jfx.jar
 /get-ui/.idea/libraries/Maven__de_hawhh_gewiss_get_simulator_0_3_5.xml
+/get-simulator/target/classes/de/hawhh/gewiss/get/simulator/renovation/RenovationHeatExchangeRateStrategy$1.class
+/get-simulator/target/get-simulator-0.3.7.jar
+/get-ui/target/jfx/app/lib/get-simulator-0.3.7.jar
+/get-ui/target/get-ui-0.3.7.jar
+/get-ui/target/jfx/app/get-ui-0.3.7-jfx.jar
+/get-ui/.idea/libraries/Maven__de_hawhh_gewiss_get_simulator_0_3_7.xml

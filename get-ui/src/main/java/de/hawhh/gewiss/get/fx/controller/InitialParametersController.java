@@ -4,10 +4,13 @@ import de.hawhh.gewiss.get.core.input.CO2FactorsData;
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
 import de.hawhh.gewiss.get.core.input.SimulationParameter;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.RenovationType;
 import de.hawhh.gewiss.get.simulator.db.dao.PrimaryEnergyFactorsDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Accordion;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -28,12 +31,16 @@ public class InitialParametersController {
     public static final String BUILDING_AGE = "Building Age/Last Renovation";
     public static final String CO2_EMISSION = "CO2 Emission";
     public static final String CO2_EMISSION_SQUARE_METER = "CO2 Emission (m^2)";
-    //@TODO: (optional) FIRST_YEAR -> grab from sqlite DB (get-simulator) or set in UI (get-ui)?
     public static final Integer START_CO2_YEAR = SimulationParameter.FIRST_YEAR;
     public static final Integer MID_CO2_YEAR = 2030;
     public static final Integer FINAL_CO2_YEAR = 2050;
     private PrimaryEnergyFactorsDAO energyFactorsDAO;
 
+    // UI elements
+    @FXML
+    private Accordion accordion;
+    @FXML
+    private TitledPane co2Pane;
     // Initial simulation parameters
     @FXML
     private TextField globalName;
@@ -50,6 +57,8 @@ public class InitialParametersController {
     // Heating System Exchange Table
     @FXML
     private TableView<HeatingSystemExchangeRate> heatingSystemExchangeTable;
+    @FXML
+    private TableColumn<HeatingSystemExchangeRate, String> renType;
     @FXML
     private TableColumn<HeatingSystemExchangeRate, String> oldType;
     @FXML
@@ -88,6 +97,7 @@ public class InitialParametersController {
     private void initHeatExchangeTable() {
         // Define the connection between data model and table columns
         oldType.setCellValueFactory(new PropertyValueFactory<>("oldType"));
+        renType.setCellValueFactory(new PropertyValueFactory<>("renType"));
 
         lowTempBoilerRate.setCellValueFactory(new PropertyValueFactory<>("lowTempBoilerRate"));
         lowTempBoilerRate.setEditable(true);
@@ -201,6 +211,29 @@ public class InitialParametersController {
         heatingSystemExchangeTable.setEditable(true);
     }
 
+    /**
+     * Creates and returns the default list for {@link HeatingSystemExchangeRate}s.
+     */
+    private ObservableList<HeatingSystemExchangeRate> getHeatExchangeList() {
+        return FXCollections.observableArrayList(
+                // residential Basic Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                // residential Good Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                // non-residential Basic Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                // non-residential Good Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0)
+        );
+    }
 
     /**
      * Initializes the CO2 Factors Data table and connects the view to the underlying data model.
@@ -254,19 +287,8 @@ public class InitialParametersController {
 
         cO2FactorsTable.setItems(getCO2FactorsDataList());
         cO2FactorsTable.setEditable(true);
+        accordion.setExpandedPane(co2Pane);
     }
-
-    /**
-     * Creates and returns the default list for {@link HeatingSystemExchangeRate}s.
-     */
-    private ObservableList<HeatingSystemExchangeRate> getHeatExchangeList() {
-        return FXCollections.observableArrayList(
-                new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0)
-        );
-    }
-
     /**
      * Creates and returns the default list for {@link CO2FactorsData}.
      */
@@ -343,7 +365,7 @@ public class InitialParametersController {
                 try {
                     Long seed = Long.parseLong(text);
                 } catch (NumberFormatException e) {
-                    Long seed = System.currentTimeMillis();
+                    Long seed = System.nanoTime();
                     globalSeed.setText(String.valueOf(seed));
                 }
             }
@@ -355,7 +377,7 @@ public class InitialParametersController {
      */
     @FXML
     private void generateSeed() {
-        Long seed = System.currentTimeMillis();
+        Long seed = System.nanoTime();
         globalSeed.setText(String.valueOf(seed));
     }
 
@@ -406,7 +428,7 @@ public class InitialParametersController {
         try {
             seed = Long.parseLong(text);
         } catch (NumberFormatException e) {
-            seed = System.currentTimeMillis();
+            seed = System.nanoTime();
             globalSeed.setText(String.valueOf(seed));
         } finally {
             return seed;
