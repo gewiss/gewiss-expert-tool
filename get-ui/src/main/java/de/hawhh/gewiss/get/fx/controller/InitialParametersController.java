@@ -31,7 +31,6 @@ public class InitialParametersController {
     public static final String BUILDING_AGE = "Building Age/Last Renovation";
     public static final String CO2_EMISSION = "CO2 Emission";
     public static final String CO2_EMISSION_SQUARE_METER = "CO2 Emission (m^2)";
-    //@TODO: (optional) FIRST_YEAR -> grab from sqlite DB (get-simulator) or set in UI (get-ui)?
     public static final Integer START_CO2_YEAR = SimulationParameter.FIRST_YEAR;
     public static final Integer MID_CO2_YEAR = 2030;
     public static final Integer FINAL_CO2_YEAR = 2050;
@@ -55,7 +54,7 @@ public class InitialParametersController {
     private TextField globalSeed;
     @FXML
     private CheckComboBox<String> rankingMethods;
-    // Heating System Exchange Table Residential Renovation Level 1
+    // Heating System Exchange Table
     @FXML
     private TableView<HeatingSystemExchangeRate> heatingSystemExchangeTable;
     @FXML
@@ -217,42 +216,22 @@ public class InitialParametersController {
      */
     private ObservableList<HeatingSystemExchangeRate> getHeatExchangeList() {
         return FXCollections.observableArrayList(
-                new HeatingSystemExchangeRate(
-                RenovationType.RES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-        ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.RES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.RES_BASIC, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.RES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.RES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.RES_GOOD, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.NRES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.NRES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.NRES_BASIC, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.NRES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.NRES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                ),
-                new HeatingSystemExchangeRate(
-                        RenovationType.NRES_GOOD, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0
-                )
+                // residential Basic Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_BASIC, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                // residential Good Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_GOOD, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                // non-residential Basic Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_BASIC, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                // non-residential Good Renovation matrix
+                new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_GOOD, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0)
         );
     }
 
@@ -386,7 +365,7 @@ public class InitialParametersController {
                 try {
                     Long seed = Long.parseLong(text);
                 } catch (NumberFormatException e) {
-                    Long seed = System.currentTimeMillis();
+                    Long seed = System.nanoTime();
                     globalSeed.setText(String.valueOf(seed));
                 }
             }
@@ -398,7 +377,7 @@ public class InitialParametersController {
      */
     @FXML
     private void generateSeed() {
-        Long seed = System.currentTimeMillis();
+        Long seed = System.nanoTime();
         globalSeed.setText(String.valueOf(seed));
     }
 
@@ -431,7 +410,6 @@ public class InitialParametersController {
     }
     
     public List<HeatingSystemExchangeRate> getHeatingSystemExchangeRates() {
-        //@TODO: work will be needed here
         return heatingSystemExchangeTable.getItems();
     }
 
@@ -450,7 +428,7 @@ public class InitialParametersController {
         try {
             seed = Long.parseLong(text);
         } catch (NumberFormatException e) {
-            seed = System.currentTimeMillis();
+            seed = System.nanoTime();
             globalSeed.setText(String.valueOf(seed));
         } finally {
             return seed;

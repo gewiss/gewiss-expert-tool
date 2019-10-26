@@ -58,53 +58,88 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
             //LOGGER.log(Level.INFO, "Renovating building {0}\twith score {1}", new Object[]{sb.getBuilding().getAlkisID(), sb.getScore()});
             Building building = sb.getBuilding();
 
-            // renovation of the building hull
+            // renovation of the building hull and heating system
+            // if the building has a residential component treat it entirely as residential!
             if (building.getRenovationLevel().equals(RenovationLevel.NO_RENOVATION)) {
                 // Perform a "normal" or passive house standard renovation depending on the passive house rate
                 if (pseudoRandomGenerator.nextDouble() * 100 <= passiveHouseRate) {
+                    // Renovation level 0 to 2 (passive house standard)
                     building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
+                    if (building.getResidentialType() != null) {
+                        updateHeatingSystem(building, this.heatingExchangeClasses_ResGood, pseudoRandomGenerator);
+                    } else {
+                        updateHeatingSystem(building, this.heatingExchangeClasses_NResGood, pseudoRandomGenerator);
+                    }
+
                 } else {
+                    // Renovation level 0 to 1
                     building.renovate(RenovationLevel.BASIC_RENOVATION, currentYear);
+                    if (building.getResidentialType() != null) {
+                        updateHeatingSystem(building, this.heatingExchangeClasses_ResBasic, pseudoRandomGenerator);
+                    } else {
+                        updateHeatingSystem(building, this.heatingExchangeClasses_NResBasic, pseudoRandomGenerator);
+                    }
+
                 }
             } else if (building.getRenovationLevel().equals(RenovationLevel.BASIC_RENOVATION)) {
+                // Renovation level 1 to 2
                 building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
-            }
-            
-            // renovation/exchange of heating system
-            // @TODO: add to if / else if checks above and select the appropriate heating exchange class based on that
-            // create a separate private method for the for loop, with building and heatingExchange classes as params
-            // if residential + non_residential : treat as residential (explain in readme.MD)
-            for (HeatingType heatingType : this.heatingExchangeClasses_ResBasic.keySet()) {
-                if (heatingType.equals(building.getHeatingType())) {
-                   Double coinToss = pseudoRandomGenerator.nextDouble() * 100;
-                   Map<Range<Double>, HeatingType> classes = this.heatingExchangeClasses_ResBasic.get(heatingType);
-                   
-                   for (Range<Double> classRange : classes.keySet()) {
-                       if (classRange.contains(coinToss)) {
-                           building.exchangeHeatingSystem(classes.get(classRange));
-                           //LOGGER.log(Level.INFO, "Changed heating systemn in building {0} from {1} to {2}", new Object[]{building.getAlkisID(), heatingType, building.getHeatingType()});
-                       }
-                   }
+                if (building.getResidentialType() != null) {
+                    updateHeatingSystem(building, this.heatingExchangeClasses_ResGood, pseudoRandomGenerator);
+                } else {
+                    updateHeatingSystem(building, this.heatingExchangeClasses_NResGood, pseudoRandomGenerator);
                 }
             }
+
         });
+    }
+
+    /**
+     * Renovation/exchange of heating system.
+     * The possible transitions are level 0 to 1; 1 to 2 and 0 to 2. The transition rates to level 2 (GOOD_RENOVATION)
+     * are the same! (@TODO: explain in readme.MD)!
+     *
+     * @param building
+     * @param heatingExchangeClasses
+     * @param pseudoRandomGenerator
+     */
+    private void updateHeatingSystem(Building building, Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses, Random pseudoRandomGenerator) {
+
+        for (HeatingType heatingType : heatingExchangeClasses.keySet()) {
+            if (heatingType.equals(building.getHeatingType())) {
+                Double coinToss = pseudoRandomGenerator.nextDouble() * 100;
+                Map<Range<Double>, HeatingType> classes = heatingExchangeClasses.get(heatingType);
+
+                for (Range<Double> classRange : classes.keySet()) {
+                    if (classRange.contains(coinToss)) {
+                        building.exchangeHeatingSystem(classes.get(classRange));
+                        //LOGGER.log(Level.INFO, "Changed heating systemn in building {0} from {1} to {2}", new Object[]{building.getAlkisID(), heatingType, building.getHeatingType()});
+                    }
+                }
+            }
+        }
     }
 
     private void createHeatingExchangeClasses(List<HeatingSystemExchangeRate> heatingSystemExchangeRates) {
         this.heatingExchangeClasses_ResBasic = new HashMap<>();
+        this.heatingExchangeClasses_ResGood = new HashMap<>();
+        this.heatingExchangeClasses_NResBasic = new HashMap<>();
+        this.heatingExchangeClasses_NResGood = new HashMap<>();
 
         heatingSystemExchangeRates.forEach((exchangeRate) -> {
+            HeatingType originType = exchangeRate.getOldType();
             switch(exchangeRate.getRenType()) {
                 case RES_BASIC:
-                    HeatingType originType = exchangeRate.getOldType();
                     this.heatingExchangeClasses_ResBasic.put(originType, createTransition(exchangeRate));
                     break;
-                // @TODO: based on new input param, switch statement for different HashMaps
                 case RES_GOOD:
+                    this.heatingExchangeClasses_ResGood.put(originType, createTransition(exchangeRate));
                     break;
                 case NRES_BASIC:
+                    this.heatingExchangeClasses_NResBasic.put(originType, createTransition(exchangeRate));
                     break;
                 case NRES_GOOD:
+                    this.heatingExchangeClasses_NResGood.put(originType, createTransition(exchangeRate));
                     break;
             }
 
@@ -113,6 +148,12 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
         printHeatingExchangeClasses();
     }
 
+    /**
+     * Generate the transition map for the heating exchange rates
+     *
+     * @param exchangeRate
+     * @return
+     */
     private Map<Range<Double>, HeatingType> createTransition(HeatingSystemExchangeRate exchangeRate) {
         exchangeRate.normalize();
         Map<Range<Double>, HeatingType> transitions = new HashMap<>();
@@ -166,12 +207,35 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     }
 
     private void printHeatingExchangeClasses() {
-        this.heatingExchangeClasses_ResBasic.keySet().stream().peek((originType) -> LOGGER.log(Level.INFO, "Heating Exchange Classes for: {0}", originType)).forEachOrdered((originType) -> {
+        // not very elegant, but only logging
+        this.heatingExchangeClasses_ResBasic.keySet().stream().peek((originType) -> LOGGER.log(Level.INFO, "Residential Basic Heating Exchange Classes for: {0}", originType)).forEachOrdered((originType) -> {
             this.heatingExchangeClasses_ResBasic.get(originType).keySet().forEach((range) -> {
                 HeatingType toType = this.heatingExchangeClasses_ResBasic.get(originType).get(range);
                 
                 LOGGER.log(Level.INFO, "{0}\t-->\t{1}", new Object[]{range, toType});
             });
         });
+        this.heatingExchangeClasses_ResGood.keySet().stream().peek((originType) -> LOGGER.log(Level.INFO, "Residential Good Heating Exchange Classes for: {0}", originType)).forEachOrdered((originType) -> {
+            this.heatingExchangeClasses_ResGood.get(originType).keySet().forEach((range) -> {
+                HeatingType toType = this.heatingExchangeClasses_ResGood.get(originType).get(range);
+
+                LOGGER.log(Level.INFO, "{0}\t-->\t{1}", new Object[]{range, toType});
+            });
+        });
+        this.heatingExchangeClasses_NResBasic.keySet().stream().peek((originType) -> LOGGER.log(Level.INFO, "Non-Residential Basic Heating Exchange Classes for: {0}", originType)).forEachOrdered((originType) -> {
+            this.heatingExchangeClasses_NResBasic.get(originType).keySet().forEach((range) -> {
+                HeatingType toType = this.heatingExchangeClasses_NResBasic.get(originType).get(range);
+
+                LOGGER.log(Level.INFO, "{0}\t-->\t{1}", new Object[]{range, toType});
+            });
+        });
+        this.heatingExchangeClasses_NResGood.keySet().stream().peek((originType) -> LOGGER.log(Level.INFO, "Non-Residential Good Heating Exchange Classes for: {0}", originType)).forEachOrdered((originType) -> {
+            this.heatingExchangeClasses_NResGood.get(originType).keySet().forEach((range) -> {
+                HeatingType toType = this.heatingExchangeClasses_NResGood.get(originType).get(range);
+
+                LOGGER.log(Level.INFO, "{0}\t-->\t{1}", new Object[]{range, toType});
+            });
+        });
+
     }
 }
