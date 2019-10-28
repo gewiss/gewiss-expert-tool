@@ -175,10 +175,12 @@ Afterwards you can find the native executable as well as an installer for your p
 * The starting year of the simulation is currently hard-set in the SimulationParameters class (FIRST_YEAR = 2019).
 * The possible renovation level transitions for the "Heating System Exchange Control Matrix" are 0 to 1, 0 to 2, and 1 to 2. Renovation level 0 to 2 and 1 to 2 have the same transition rate.
 * Below is a small table showcasing the different acronyms used for the Renovation Levels.
-##### Acronyms for Renovation Levels
+#### Acronyms for Renovation Levels
 | UI Table ENUMs    | Other names          | Type                | Description            |
 |-------------------|----------------------|---------------------|------------------------|
 | N/A               | Unrenovated          | Renovation Level 0  | Not renovated          |
-| ***_ENEV          | EnEV 2014            | Renovation Level 1  | Basic renovation       | 
-| ***_PASSIVE       | Passive House        | Renovation Level 2  | Good  renovation       | 
-***: RES for Residential; NRES for Non-Residential.
+| \*\*\*\_ENEV      | EnEV 2014            | Renovation Level 1  | Basic renovation       | 
+| \*\*\*\_PASSIVE   | Passive House        | Renovation Level 2  | Good  renovation       | 
+
+\*\*\*: RES for Residential; NRES for Non-Residential.
+
