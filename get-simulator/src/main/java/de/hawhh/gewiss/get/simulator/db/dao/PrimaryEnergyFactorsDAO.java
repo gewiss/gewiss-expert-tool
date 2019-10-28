@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * DAO for the "primary_energy_factors" table.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class PrimaryEnergyFactorsDAO extends SQLiteDAO {
 
@@ -27,7 +27,7 @@ public class PrimaryEnergyFactorsDAO extends SQLiteDAO {
     /**
      * Find all {@link PrimaryEnergyFactors}s as a {@link Map} where the {@link HeatingType} is the key and the {@link PrimaryEnergyFactors} the value.
      *
-     * @return
+     * @return results
      */
     public Map<HeatingType, PrimaryEnergyFactors> findAll() {
         Map<HeatingType, PrimaryEnergyFactors> results = new HashMap<>();

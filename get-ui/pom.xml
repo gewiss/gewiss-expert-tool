@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.hawhh.gewiss</groupId>
     <artifactId>get-ui</artifactId>
-    <version>0.3.7</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
     
     <name>GET-UI</name>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>de.hawhh.gewiss</groupId>
             <artifactId>get-simulator</artifactId>
-            <version>0.3.7</version>
+            <version>0.4.0</version>
             <type>jar</type>
         </dependency>
         <dependency>

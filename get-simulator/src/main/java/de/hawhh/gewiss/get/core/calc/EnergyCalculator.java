@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Helper class (singleton) for different energy based calculations (like heat demand, co2 emission). It uses maps to
+ * Helper class (singleton) for different energy based calculations (like heat demand, CO2 emissions). It uses maps to
  * cache the values in the database to significantly speed up the look up operations.
  *
  * @author Thomas Preisler, Antony Sotirov
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public class EnergyCalculator {
     private final static Logger LOGGER = Logger.getLogger(EnergyCalculator.class.getName());
     private static final EnergyCalculator ourInstance = new EnergyCalculator();
-    private Boolean yearlyCO2RatesInterpolated = false;
+    private Boolean areYearlyCO2RatesInterpolated = false;
     private Integer midCO2Year = null;
     private Integer finalCO2Year = null;
 
@@ -116,7 +116,7 @@ public class EnergyCalculator {
             for (CO2FactorsData data: co2FactorsData) {
                 linInterpolation(data); // can throw NullPointerException
             }
-            yearlyCO2RatesInterpolated = true;
+            areYearlyCO2RatesInterpolated = true;
         } catch (NullPointerException e) {
             throw new InputValidationException((e.getMessage()));
         }
@@ -126,7 +126,8 @@ public class EnergyCalculator {
     /**
      * Linear interpolation method that creates CO2 yearly emissions for two data ranges:
      * (start) FIRST_YEAR - midCO2Year; midCO2Year - finalCO2Year (end)
-     * based on given CO2 values for the start, mid and final year (present in CO2Factors data)
+     * based on given CO2 values for the start, mid and final year (present in CO2Factors data).
+     * Result is stored in the {@link PrimaryEnergyFactors} object associated with the given {@link HeatingType}.
      *
      * @param data CO2FactorsData for a given {@link HeatingType}
      */
@@ -174,15 +175,15 @@ public class EnergyCalculator {
      */
     public Double calcCO2Emission(Building building, Integer year) {
         Double co2Emission = 0d;
-        if (!yearlyCO2RatesInterpolated) {
-            LOGGER.log(Level.INFO, "Yearly interpolated CO2 rates not calculated: using base CO2 Emissions from DB instead");
-            return calcCO2Emission(building);
+        if (!areYearlyCO2RatesInterpolated) {
+            LOGGER.log(Level.INFO, "Yearly interpolated CO2 rates not calculated! Using base CO2 Emissions from DB instead");
+            return calcCO2EmissionInternal(building);
         }
         if(year < SimulationParameter.FIRST_YEAR) {
             LOGGER.log(Level.INFO, "No interpolated CO2 data for year before {0}: using base CO2 Emissions from DB instead", SimulationParameter.FIRST_YEAR);
-            return calcCO2Emission(building);
+            return calcCO2EmissionInternal(building);
         } else {
-            // If year exceeds data range: all calculations will be based on finalYear
+            // If year exceeds data range: all calculations will be based on finalYear!
             if (year > finalCO2Year) {
                 // LOGGER.log(Level.INFO, "Year exceeds data range: all calculations will be based on finalYear {0}", 2050);
                 year = finalCO2Year;
@@ -211,13 +212,13 @@ public class EnergyCalculator {
     }
 
     /**
-     * Calculate the co2 emission in g for the given {@link Building}
-     * using the {@link PrimaryEnergyFactorsDAO} and {@link HeatDemandFinalEnergyDAO}.
+     * Calculate the CO2 emissions for the given {@link Building}
+     * using {@link HeatDemandFinalEnergyDAO} and only the starting CO2 emissions from {@link PrimaryEnergyFactors}!
      *
      * @param building
      * @return calculated CO2 emissions for {@link HeatingType } from specific {@link Building}
      */
-    public Double calcCO2Emission(Building building) {
+    private Double calcCO2EmissionInternal(Building building) {
         Double co2Emission = 0d;
 
         if (building.getResidentialType() != null) {
@@ -310,7 +311,7 @@ public class EnergyCalculator {
      * @return
      */
     public Boolean hasYearlyCO2RatesInterpolated() {
-        return yearlyCO2RatesInterpolated;
+        return areYearlyCO2RatesInterpolated;
     }
 
     /**

@@ -40,7 +40,7 @@ public class SQLiteConnection {
                     // check if the program is running in a jar or from IDE
                     if (SQLiteConnection.class.getResource("SQLiteConnection.class").getProtocol().equals("jar")) {
                         LOGGER.info("Running from JAR");
-                        url = "jdbc:sqlite::resource:jar:file:lib/get-simulator-0.3.7.jar!" + DB_FILE;
+                        url = "jdbc:sqlite::resource:jar:file:lib/get-simulator-0.4.0.jar!" + DB_FILE;
                     } else {
                         LOGGER.info("Running from IDE");
 

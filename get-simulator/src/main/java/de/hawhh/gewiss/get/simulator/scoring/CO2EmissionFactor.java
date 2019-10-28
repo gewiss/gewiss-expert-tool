@@ -20,7 +20,7 @@ public class CO2EmissionFactor implements ScoringMethod {
     @Override
     public Double calcBaseScore(Building building, Integer simYear) {
         if (!building.getRenovationLevel().equals(RenovationLevel.GOOD_RENOVATION)) {
-            return energyCalculator.calcCO2Emission(building);
+            return energyCalculator.calcCO2Emission(building, simYear);
         } else {
             return -1d;
         }

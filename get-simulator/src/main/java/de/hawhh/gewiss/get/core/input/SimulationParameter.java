@@ -16,6 +16,7 @@ public class SimulationParameter {
     private String name;
     private Integer stopYear;
     private List<Modifier> modifiers = new ArrayList<>();
+    // used for the calculation of the yearly CO2 Emission Rate factors:
     private List<CO2FactorsData> yearlyCO2Factors = new ArrayList<>();
     private Integer midCO2Year;
     private Integer finalCO2Year;
@@ -55,32 +56,23 @@ public class SimulationParameter {
     }
 
     /**
-     * @return a boolean whether yearly CO2 factors data is present
-     */
-    public Boolean hasCO2FactorsData() {
-        if(midCO2Year != null && finalCO2Year != null && yearlyCO2Factors != null && !yearlyCO2Factors.isEmpty()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Validates the simulation input parameters and throws an {@link InputValidationException} is one of the parameters is invalid.
      *
      * @throws InputValidationException
      */
     public void validate() throws InputValidationException {
         try {
+            if(midCO2Year == null || finalCO2Year == null || yearlyCO2Factors == null || yearlyCO2Factors.isEmpty()) {
+                throw new InputValidationException("Missing yearly CO2 Factors Data for different time periods!");
+            }
             if (stopYear < FIRST_YEAR) {
                 throw new InputValidationException("Stop year shouldn't be before " + FIRST_YEAR + " (status quo)");
             }
-            if(midCO2Year != null && finalCO2Year != null) {
-                if(midCO2Year < FIRST_YEAR) {
+            if(midCO2Year < FIRST_YEAR) {
                     throw new InputValidationException("Middle year for CO2 Emissions Rate shouldn't be before " + FIRST_YEAR + " (status quo)");
-                }
-                if(finalCO2Year < midCO2Year) {
+            }
+            if(finalCO2Year < midCO2Year) {
                     throw new InputValidationException("Final year for CO2 Emissions Rate shouldn't be before " + midCO2Year + " (status quo)");
-                }
             }
 
             for (Modifier modifier : modifiers) {

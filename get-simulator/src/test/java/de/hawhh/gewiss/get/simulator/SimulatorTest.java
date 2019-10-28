@@ -1,9 +1,6 @@
 package de.hawhh.gewiss.get.simulator;
 
-import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
-import de.hawhh.gewiss.get.core.input.InputValidationException;
-import de.hawhh.gewiss.get.core.input.Modifier;
-import de.hawhh.gewiss.get.core.input.SimulationParameter;
+import de.hawhh.gewiss.get.core.input.*;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.model.RenovationType;
@@ -43,6 +40,7 @@ public class SimulatorTest {
         Integer simStop = 2020;
         String name = "TestRun-" + LocalDateTime.now();
 
+        // modifiers for SimulationParameter
         List<Modifier> modifiers = new ArrayList<>();
         Modifier mod1 = new Modifier("OneFamilyHousesInAltona", 2020, 2030, 2d);
         mod1.setTargetQuarters(Arrays.asList("Nienstedten", "Othmarschen", "Ottensen", "Altona-Altstadt", "Rissen", "Blankenese", "Osdorf", "Iserbrook", "Groß Flottbek",
@@ -51,8 +49,20 @@ public class SimulatorTest {
         mod1.setTargetOwnershipTypes(Arrays.asList("PRIVAT", "UNKNOWN"));
         modifiers.add(mod1);
 
-        // @TODO: update test with yearlyCO2 Interpolated data; expunge calcCO2Emission(Building building) method from EnergyCalculator class; update SimParam validation method
-        this.simParams = new SimulationParameter(name, simStop, modifiers, null, null, null);
+        // CO2 Factors for SimulationParameter
+        CO2FactorsData fa1 = new CO2FactorsData(HeatingType.CONDENSING_BOILER, 201d, 201d, 201d);
+        CO2FactorsData fa2 = new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR, 201d, 201d, 201d);
+        CO2FactorsData fa3 = new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR_HEAT_RECOVERY, 201d, 201d, 201d);
+        CO2FactorsData fa4 = new CO2FactorsData(HeatingType.DISTRICT_HEAT, 291.6d, 215d, 160d);
+        CO2FactorsData fa5 = new CO2FactorsData(HeatingType.DISTRICT_HEAT_HEAT_RECOVERY, 291.6d, 215d, 160d);
+        CO2FactorsData fa6 = new CO2FactorsData(HeatingType.HEAT_PUMP_HEAT_RECOVERY, 617d, 402d, 231d);
+        CO2FactorsData fa7 = new CO2FactorsData(HeatingType.LOW_TEMPERATURE_BOILER, 201d, 201d, 201d);
+        CO2FactorsData fa8 = new CO2FactorsData(HeatingType.PELLETS, 23d, 23d, 23d);
+        CO2FactorsData fa9 = new CO2FactorsData(HeatingType.PELLETS_SOLAR_HEAT_RECOVERY, 23d, 23d, 23d);
+        List<CO2FactorsData> yearlyCO2Factors = new ArrayList<>(Arrays.asList(fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9));
+
+
+        this.simParams = new SimulationParameter(name, simStop, modifiers, yearlyCO2Factors, 2030, 2050);
 
         this.scoringMethods = new ArrayList<>();
         this.scoringMethods.add(new BuildingAgeFactor());
