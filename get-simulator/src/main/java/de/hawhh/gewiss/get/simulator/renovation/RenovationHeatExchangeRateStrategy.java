@@ -97,7 +97,7 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     /**
      * Renovation/exchange of heating system.
      * The possible transitions are level 0 to 1; 1 to 2 and 0 to 2. The transition rates to level 2 (GOOD_RENOVATION)
-     * are the same! (@TODO: explain in readme.MD)!
+     * are the same!
      *
      * @param building
      * @param heatingExchangeClasses
@@ -129,16 +129,16 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
         heatingSystemExchangeRates.forEach((exchangeRate) -> {
             HeatingType originType = exchangeRate.getOldType();
             switch(exchangeRate.getRenType()) {
-                case RES_BASIC:
+                case RES_ENEV:
                     this.heatingExchangeClasses_ResBasic.put(originType, createTransition(exchangeRate));
                     break;
-                case RES_GOOD:
+                case RES_PASSIVE:
                     this.heatingExchangeClasses_ResGood.put(originType, createTransition(exchangeRate));
                     break;
-                case NRES_BASIC:
+                case NRES_ENEV:
                     this.heatingExchangeClasses_NResBasic.put(originType, createTransition(exchangeRate));
                     break;
-                case NRES_GOOD:
+                case NRES_PASSIVE:
                     this.heatingExchangeClasses_NResGood.put(originType, createTransition(exchangeRate));
                     break;
             }

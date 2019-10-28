@@ -29,7 +29,7 @@ public class HeatingSystemExchangeRate {
     private final SimpleDoubleProperty condBoilerSolarHRRate;
 
     public HeatingSystemExchangeRate() {
-        this(RenovationType.RES_BASIC, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
+        this(RenovationType.RES_ENEV, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
     }
 
     public HeatingSystemExchangeRate(RenovationType renType, HeatingType oldType, Double lowTempBoilerRate, Double districtHeatRate, Double condensingBoilerRate, Double condBoilerSolarRate,

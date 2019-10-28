@@ -7,9 +7,8 @@ package de.hawhh.gewiss.get.core.model;
  * @author Antony Sotirov
  */
 public enum RenovationType {
-    //@TODO: naming of enums -> consult with Team Peters
-    RES_BASIC,   // Residential Renovation Level 1
-    RES_GOOD,   // Residential Renovation Level 2
-    NRES_BASIC,  // Non-Residential Renovation Level 1
-    NRES_GOOD   // Non-Residential Renovation Level 2
+    RES_ENEV,       // Residential Renovation Level 1
+    RES_PASSIVE,    // Residential Renovation Level 2
+    NRES_ENEV,      // Non-Residential Renovation Level 1
+    NRES_PASSIVE    // Non-Residential Renovation Level 2
 }

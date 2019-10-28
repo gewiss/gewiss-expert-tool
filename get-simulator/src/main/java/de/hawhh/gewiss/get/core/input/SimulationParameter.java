@@ -11,7 +11,6 @@ import lombok.Data;
  */
 @Data
 public class SimulationParameter {
-    // @TODO: consult with Team Peters: grab year from DB (also part of UI? (checks needed against DB))
     public static final Integer FIRST_YEAR = 2019; // also used as 'startCO2Year'
 
     private String name;
