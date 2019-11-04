@@ -71,7 +71,7 @@ public class SQLiteBuildingDAOTest {
         if (SQLiteConnection.DB_FILE.contains("anonymized")) {
             assertEquals(11, types.size());
         } else {
-            assertEquals(19, types.size());
+            assertEquals(51, types.size());
         }
     }
 
