@@ -30,6 +30,11 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_ResGood;
     private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_NResBasic;
     private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_NResGood;
+    // same as the 4 maps before, but with district heating set to 0%; not very elegant, but gets the job done
+    private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_ResBasic_noDH;
+    private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_ResGood_noDH;;
+    private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_NResBasic_noDH;;
+    private Map<HeatingType, Map<Range<Double>, HeatingType>> heatingExchangeClasses_NResGood_noDH;;
 
     /**
      * Default constructor. Here the yearly renovation rate and the chance for a basic renovation rate can be set. In both cases a value of 50.0 equals 50%.
@@ -64,34 +69,56 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
                 // Perform a "normal" or passive house standard renovation depending on the passive house rate
                 if (pseudoRandomGenerator.nextDouble() * 100 <= passiveHouseRate) {
                     // Renovation level 0 to 2 (passive house standard)
-                    building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
-                    if (building.getResidentialType() != null) {
-                        updateHeatingSystem(building, this.heatingExchangeClasses_ResGood, pseudoRandomGenerator);
-                    } else {
-                        updateHeatingSystem(building, this.heatingExchangeClasses_NResGood, pseudoRandomGenerator);
-                    }
+                    makeGoodRenovation(currentYear, pseudoRandomGenerator, building);
 
                 } else {
                     // Renovation level 0 to 1
                     building.renovate(RenovationLevel.BASIC_RENOVATION, currentYear);
                     if (building.getResidentialType() != null) {
-                        updateHeatingSystem(building, this.heatingExchangeClasses_ResBasic, pseudoRandomGenerator);
+                        if (building.hasAccessDistrictHeating() == true) {
+                            updateHeatingSystem(building, this.heatingExchangeClasses_ResBasic, pseudoRandomGenerator);
+                        } else {
+                            updateHeatingSystem(building, this.heatingExchangeClasses_ResBasic_noDH, pseudoRandomGenerator);
+                        }
                     } else {
-                        updateHeatingSystem(building, this.heatingExchangeClasses_NResBasic, pseudoRandomGenerator);
+                        if (building.hasAccessDistrictHeating() == true) {
+                            updateHeatingSystem(building, this.heatingExchangeClasses_NResBasic, pseudoRandomGenerator);
+                        } else {
+                            updateHeatingSystem(building, this.heatingExchangeClasses_NResBasic_noDH, pseudoRandomGenerator);
+                        }
                     }
 
                 }
             } else if (building.getRenovationLevel().equals(RenovationLevel.BASIC_RENOVATION)) {
                 // Renovation level 1 to 2
-                building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
-                if (building.getResidentialType() != null) {
-                    updateHeatingSystem(building, this.heatingExchangeClasses_ResGood, pseudoRandomGenerator);
-                } else {
-                    updateHeatingSystem(building, this.heatingExchangeClasses_NResGood, pseudoRandomGenerator);
-                }
+                makeGoodRenovation(currentYear, pseudoRandomGenerator, building);
             }
 
         });
+    }
+
+    /**
+     * Helper method for transitions 0 to 1 and 0 to 2 for Renovation Levels.
+     *
+     * @param currentYear
+     * @param pseudoRandomGenerator
+     * @param building
+     */
+    private void makeGoodRenovation(Integer currentYear, Random pseudoRandomGenerator, Building building) {
+        building.renovate(RenovationLevel.GOOD_RENOVATION, currentYear);
+        if (building.getResidentialType() != null) {
+            if (building.hasAccessDistrictHeating() == true) {
+                updateHeatingSystem(building, this.heatingExchangeClasses_ResGood, pseudoRandomGenerator);
+            } else {
+                updateHeatingSystem(building, this.heatingExchangeClasses_ResGood_noDH, pseudoRandomGenerator);
+            }
+        } else {
+            if (building.hasAccessDistrictHeating() == true) {
+                updateHeatingSystem(building, this.heatingExchangeClasses_NResGood, pseudoRandomGenerator);
+            } else {
+                updateHeatingSystem(building, this.heatingExchangeClasses_NResGood_noDH, pseudoRandomGenerator);
+            }
+        }
     }
 
     /**
@@ -121,25 +148,47 @@ public class RenovationHeatExchangeRateStrategy implements IRenovationStrategy {
     }
 
     private void createHeatingExchangeClasses(List<HeatingSystemExchangeRate> heatingSystemExchangeRates) {
+        // normal hash-maps for 4 types of exchange rates
         this.heatingExchangeClasses_ResBasic = new HashMap<>();
         this.heatingExchangeClasses_ResGood = new HashMap<>();
         this.heatingExchangeClasses_NResBasic = new HashMap<>();
         this.heatingExchangeClasses_NResGood = new HashMap<>();
+        // same but with District Heating set to 0
+        this.heatingExchangeClasses_ResBasic_noDH = new HashMap<>();
+        this.heatingExchangeClasses_ResGood_noDH = new HashMap<>();
+        this.heatingExchangeClasses_NResBasic_noDH = new HashMap<>();
+        this.heatingExchangeClasses_NResGood_noDH = new HashMap<>();
 
         heatingSystemExchangeRates.forEach((exchangeRate) -> {
             HeatingType originType = exchangeRate.getOldType();
             switch(exchangeRate.getRenType()) {
                 case RES_ENEV:
                     this.heatingExchangeClasses_ResBasic.put(originType, createTransition(exchangeRate));
+                    // create map without any district heats (if house not in proximity)
+                    exchangeRate.setDistrictHeatRate(0d);
+                    exchangeRate.setDistrictHeatHRRate(0d);
+                    this.heatingExchangeClasses_ResBasic_noDH.put(originType, createTransition(exchangeRate));
                     break;
                 case RES_PASSIVE:
                     this.heatingExchangeClasses_ResGood.put(originType, createTransition(exchangeRate));
+                    // create map without any district heats (if house not in proximity)
+                    exchangeRate.setDistrictHeatRate(0d);
+                    exchangeRate.setDistrictHeatHRRate(0d);
+                    this.heatingExchangeClasses_ResGood_noDH.put(originType, createTransition(exchangeRate));
                     break;
                 case NRES_ENEV:
                     this.heatingExchangeClasses_NResBasic.put(originType, createTransition(exchangeRate));
+                    // create map without any district heats (if house not in proximity)
+                    exchangeRate.setDistrictHeatRate(0d);
+                    exchangeRate.setDistrictHeatHRRate(0d);
+                    this.heatingExchangeClasses_NResBasic_noDH.put(originType, createTransition(exchangeRate));
                     break;
                 case NRES_PASSIVE:
                     this.heatingExchangeClasses_NResGood.put(originType, createTransition(exchangeRate));
+                    // create map without any district heats (if house not in proximity)
+                    exchangeRate.setDistrictHeatRate(0d);
+                    exchangeRate.setDistrictHeatHRRate(0d);
+                    this.heatingExchangeClasses_NResGood_noDH.put(originType, createTransition(exchangeRate));
                     break;
             }
 

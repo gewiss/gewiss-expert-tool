@@ -14,8 +14,8 @@ import java.util.logging.Logger;
  */
 public class SQLiteConnection {
 
-    //public final static String DB_FILE = "/GEWISS_buildings_v_1.17.1.sqlite";
-    public final static String DB_FILE = "/GEWISS_buildings_1.16.8_IST_anonymized_for_testing.sqlite"; // anonymised data set
+    public final static String DB_FILE = "/GEWISS_buildings.sqlite";
+   //public final static String DB_FILE = "/GEWISS_buildings_anonymized_for_testing.sqlite"; // anatomised data set
     
     private final static Logger LOGGER = Logger.getLogger(SQLiteConnection.class.getName());
 

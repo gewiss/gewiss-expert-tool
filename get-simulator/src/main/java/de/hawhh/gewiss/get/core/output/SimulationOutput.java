@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class SimulationOutput {
 
-    private String buildingId;
+    private String buildingId; // alkisID
     private Integer year;
     private Double heatDemandM2;
     private Double heatDemand;
