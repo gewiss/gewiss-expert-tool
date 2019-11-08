@@ -178,14 +178,14 @@
                                 <TableColumn fx:id="renType" editable="false" maxWidth="150.0" minWidth="130.0" prefWidth="200.0" text="Renovation Type"/>
                                 <TableColumn fx:id="oldType" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Old\New"/>
                                 <TableColumn fx:id="lowTempBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Low Temp Boiler"/>
-                                <TableColumn fx:id="districtHeatRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat"/>
                                 <TableColumn fx:id="condensingBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Condensing Boiler"/>
                                 <TableColumn fx:id="condBoilerSolarRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar"/>
+                                <TableColumn fx:id="condBoilerSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar HR"/>
                                 <TableColumn fx:id="pelletsRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Pellets"/>
-                                <TableColumn fx:id="heatPumpHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Heat Pump HR"/>
                                 <TableColumn fx:id="pelletsSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Pellets Solar HR"/>
                                 <TableColumn fx:id="districtHeatHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat HR"/>
-                                <TableColumn fx:id="condBoilerSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar HR"/>
+                                <TableColumn fx:id="districtHeatRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat"/>
+                                <TableColumn fx:id="heatPumpHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Heat Pump HR"/>
                             </columns>
                         </TableView>
                     </content>

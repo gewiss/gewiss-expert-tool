@@ -217,21 +217,21 @@ public class InitialParametersController {
     private ObservableList<HeatingSystemExchangeRate> getHeatExchangeList() {
         return FXCollections.observableArrayList(
                 // residential Basic Renovation matrix
-                new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 0d, 44d, 42d, 0d, 9d, 0d, 0d, 6d, 0d),
+                new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 10d, 90d, 0d),
+                new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.CONDENSING_BOILER, 0d, 44d, 42d, 0d, 9d, 0d, 0d, 6d, 0d),
                 // residential Good Renovation matrix
-                new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 0d, 0d, 0d, 32d, 0d, 32d, 6d, 0d, 30d),
+                new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 50d, 50d, 0d),
+                new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.CONDENSING_BOILER, 0d, 0d, 0d, 32d, 0d, 32d, 6d, 0d, 30d),
                 // non-residential Basic Renovation matrix
-                new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
+                new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 0d, 44d, 42d, 0d, 9d, 0d, 0d, 6d, 0d),
+                new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 10d, 90d, 0d),
+                new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.CONDENSING_BOILER, 0d, 44d, 42d, 0d, 9d, 0d, 0d, 6d, 0d),
                 // non-residential Good Renovation matrix
-                new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0),
-                new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.CONDENSING_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0)
+                new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 0d, 0d, 0d, 32d, 0d, 32d, 6d, 0d, 30d),
+                new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 50d, 50d, 0d),
+                new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.CONDENSING_BOILER, 0d, 0d, 0d, 32d, 0d, 32d, 6d, 0d, 30d)
         );
     }
 
