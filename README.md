@@ -171,6 +171,7 @@ Afterwards you can find the native executable as well as an installer for your p
 
 
 #### Miscellaneous
+* The  names of the SQLite databases for the GET are named "GEWISS_buildings.sqlite", "GEWISS_buildings_anonymized_for_testing.sqlite".
 * Updating the values in the GUI tables ("CO<sub>2</sub> Factors in g/kWh" and "Heating System Exchange Control Matrix") requires double clicking a single cell and then pressing enter after the new value has been inserted.
 * The starting year of the simulation is currently hard-set in the SimulationParameters class (FIRST\_YEAR = 2019).
 * When data is exported using the GUI (either \*.csv or \*.xlsx file format), the SEED for the particular simulation run is appended at the name of the file name.

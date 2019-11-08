@@ -32,19 +32,19 @@ public class HeatingSystemExchangeRate {
         this(RenovationType.RES_ENEV, HeatingType.DISTRICT_HEAT, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
     }
 
-    public HeatingSystemExchangeRate(RenovationType renType, HeatingType oldType, Double lowTempBoilerRate, Double districtHeatRate, Double condensingBoilerRate, Double condBoilerSolarRate,
-            Double pelletsRate, Double heatPumpHRRate, Double pelletsSolarHRRate, Double districtHeatHRRate, Double condBoilerSolarHRRate) {
+    public HeatingSystemExchangeRate(RenovationType renType, HeatingType oldType, Double lowTempBoilerRate, Double condensingBoilerRate, Double condBoilerSolarRate,
+            Double condBoilerSolarHRRate, Double pelletsRate, Double pelletsSolarHRRate, Double districtHeatHRRate, Double districtHeatRate,  Double heatPumpHRRate) {
         this.renType = new SimpleStringProperty(renType.toString());
         this.oldType = new SimpleStringProperty(oldType.toString());
         this.lowTempBoilerRate = new SimpleDoubleProperty(lowTempBoilerRate);
-        this.districtHeatRate = new SimpleDoubleProperty(districtHeatRate);
         this.condensingBoilerRate = new SimpleDoubleProperty(condensingBoilerRate);
         this.condBoilerSolarRate = new SimpleDoubleProperty(condBoilerSolarRate);
+        this.condBoilerSolarHRRate = new SimpleDoubleProperty(condBoilerSolarHRRate);
         this.pelletsRate = new SimpleDoubleProperty(pelletsRate);
-        this.heatPumpHRRate = new SimpleDoubleProperty(heatPumpHRRate);
         this.pelletsSolarHRRate = new SimpleDoubleProperty(pelletsSolarHRRate);
         this.districtHeatHRRate = new SimpleDoubleProperty(districtHeatHRRate);
-        this.condBoilerSolarHRRate = new SimpleDoubleProperty(condBoilerSolarHRRate);
+        this.districtHeatRate = new SimpleDoubleProperty(districtHeatRate);
+        this.heatPumpHRRate = new SimpleDoubleProperty(heatPumpHRRate);
     }
 
     // Renovation Type Getters and Setters
