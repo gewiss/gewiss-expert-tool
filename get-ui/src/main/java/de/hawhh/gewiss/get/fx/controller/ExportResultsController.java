@@ -119,7 +119,7 @@ public class ExportResultsController {
 
             new Thread(exportTask).start();
         } else {
-            logArea.appendText("No simulation was performend, therefore no results to export.\n");
+            logArea.appendText("No simulation was performed, therefore no results to export.\n");
         }
     }
 }

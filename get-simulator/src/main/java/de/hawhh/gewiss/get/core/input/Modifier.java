@@ -12,12 +12,13 @@ import java.util.List;
  * Data model for the Modifier approach. A modifier has a year range where it is active, an impact value and multiple conditions that have to be fulfilled in order for a
  * {@link Building} to be selected by the modifier.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class Modifier {
 
     private List<String> targetQuarters;
     private List<String> targetBuildingsTypes;
+    private List<String> targetOwnershipTypes;
     private List<RenovationLevel> targetRenovationLevels;
     private List<HeatingType> targetHeatingSystems;
     private Double maxDistrictHeatingDistance;
@@ -46,10 +47,10 @@ public class Modifier {
     }
 
     /**
-     * For the given {@link Building} check if all conditions are fullfilled.
+     * For the given {@link Building} check if all conditions are fulfilled.
      *
      * @param building
-     * @return true if all conditions are fullfilled for the building otherwise false
+     * @return true if all conditions are fulfilled for the building otherwise false
      */
     public boolean checkConditions(Building building) {
         if (targetQuarters != null) {
@@ -60,6 +61,12 @@ public class Modifier {
 
         if (targetBuildingsTypes != null) {
             if (!(targetBuildingsTypes.contains(building.getResidentialType()) || targetBuildingsTypes.contains(building.getNonResidentialType()))) {
+                return false;
+            }
+        }
+
+        if (targetOwnershipTypes != null) {
+            if (!targetOwnershipTypes.contains(building.getOwnership())) {
                 return false;
             }
         }
@@ -113,6 +120,14 @@ public class Modifier {
 
     public void setTargetBuildingsTypes(List<String> targetBuildingsTypes) {
         this.targetBuildingsTypes = targetBuildingsTypes;
+    }
+
+    public List<String> getTargetOwnershipTypes() {
+        return targetOwnershipTypes;
+    }
+
+    public void setTargetOwnershipTypes(List<String> targetOwnershipTypes) {
+        this.targetOwnershipTypes = targetOwnershipTypes;
     }
 
     public List<RenovationLevel> getTargetRenovationLevels() {

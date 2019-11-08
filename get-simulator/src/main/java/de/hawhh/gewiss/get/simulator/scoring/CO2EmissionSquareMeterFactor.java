@@ -4,7 +4,7 @@ import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
 
 /**
- * Score a building according to it's CO2 emission per square meter.
+ * Score a building according to its CO2 emission per square meter.
  *
  * @author Thomas Preisler
  */
@@ -17,7 +17,7 @@ public class CO2EmissionSquareMeterFactor extends CO2EmissionFactor {
             if (sm <= 0d) {
                 return -1d;
             }
-            return energyCalculator.calcCO2Emission(building) / sm;
+            return energyCalculator.calcCO2Emission(building, simYear) / sm;
         } else {
             return -1d;
         }

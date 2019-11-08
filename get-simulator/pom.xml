@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.hawhh.gewiss</groupId>
     <artifactId>get-simulator</artifactId>
-    <version>0.3</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
     
     <name>GET-Simulator</name>
@@ -35,6 +35,15 @@
             <organizationUrl>https://www.haw-hamburg.de</organizationUrl>
             <roles>
                 <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Antony Sotirov</name>
+            <email>antony.sotirov@haw-hamburg.de</email>
+            <organization>HAW Hamburg</organization>
+            <organizationUrl>https://www.haw-hamburg.de</organizationUrl>
+            <roles>
                 <role>developer</role>
             </roles>
         </developer>

@@ -7,12 +7,10 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import de.hawhh.gewiss.get.core.calc.EnergyCalculator;
-import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
-import de.hawhh.gewiss.get.core.input.InputValidationException;
-import de.hawhh.gewiss.get.core.input.Modifier;
-import de.hawhh.gewiss.get.core.input.SimulationParameter;
+import de.hawhh.gewiss.get.core.input.*;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.RenovationType;
 import de.hawhh.gewiss.get.core.output.BuildingInformation;
 import de.hawhh.gewiss.get.core.output.SimulationOutput;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
@@ -35,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * The main simulator class.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class Simulator extends Observable {
 
@@ -66,16 +64,19 @@ public class Simulator extends Observable {
     public SimulationResult simulate(SimulationParameter parameter, List<ScoringMethod> scoringMethods, IRenovationStrategy renovationStrategy, Long rgSeed) throws InputValidationException {
         long startTime = System.currentTimeMillis();
 
-        if (rgSeed != null) {
-            // set the seed for the random generator
-            this.randomGenerator.setSeed(rgSeed);
-        } else {
-            // if the seed is not explicitly set, use the system time in nano second to create new "random" seed for each run.
-            this.randomGenerator.setSeed(System.nanoTime());
+        // if seed is not explicitly set, use system time in nano second to create new "random" seed for each run.
+        if (rgSeed == null) {
+            rgSeed = System.nanoTime();
         }
+        // set the seed for the random generator
+        LOGGER.log(Level.INFO, "The seed for the simulation is {0}", rgSeed);
+        this.randomGenerator.setSeed(rgSeed);
 
         // Validate the input factors
         parameter.validate();
+
+        // Populate the CO2 yearly factors list for linear interpolation
+        this.energyCalculator.prepCO2YearlyRates(parameter.getYearlyCO2Factors(), parameter.getMidCO2Year(), parameter.getFinalCO2Year());
 
         // Fetch the building from the DB
         List<Building> buildings = fetchBuildings();
@@ -84,7 +85,9 @@ public class Simulator extends Observable {
         //buildings = buildings.subList(0, 20);
 
         SimulationResult result = new SimulationResult();
+        result.setSeed(rgSeed);
         result.setName(parameter.getName());
+        
         // Convert parameter to string representation for storage in db
         // Add special support for Guava (Google) datatype for Jackson
         ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());
@@ -101,10 +104,10 @@ public class Simulator extends Observable {
             final Integer simYear = i;
             LOGGER.log(Level.INFO, "Simulating year {0}", simYear);
 
-            // Don't perform a simulation in the first year, here we just calculate the status quo
+            // Don't perform a simulation in the first year; just calculate the status quo (List<SimulationOutput> loop)
             if (i > SimulationParameter.FIRST_YEAR) {
                 // Use the stream api to calc the scores in parallel and store the building and scores in a new List
-                LOGGER.info("Calculating initial scoring values");
+                LOGGER.log(Level.INFO, "Calculating initial scoring values for year {0}", simYear);
                 List<ScoredBuilding> scoredBuildings = buildings.stream().parallel().map(building -> {
                     ScoredBuilding scoredBuilding = new ScoredBuilding(building);
 
@@ -151,16 +154,25 @@ public class Simulator extends Observable {
                 // Apply renovation strategy
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
             }
+
+
             // Calc heat demand and store results
             List<SimulationOutput> outputs = buildings.stream().parallel().map(building -> {
                 SimulationOutput output = new SimulationOutput();
-
                 Double heatDemand = energyCalculator.calcHeatDemand(building);
-                Double co2Emission = energyCalculator.calcCO2Emission(building);
+
+                // calculate the CO2 Emissions for the given building
+                Double co2Emission = energyCalculator.calcCO2Emission(building, simYear);
+
+                Double combinedArea = building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace();
 
                 output.setBuildingId(building.getAlkisID());
                 output.setHeatDemand(heatDemand);
-                output.setHeatDemandM2(heatDemand / (building.getResidentialFloorSpace() + building.getNonResidentialFloorSpace()));
+                if (combinedArea != 0) {
+                    output.setHeatDemandM2(heatDemand / combinedArea);
+                } else {
+                    output.setHeatDemandM2(0.0);
+                }
                 output.setRenovationLevel(building.getRenovationLevel());
 
                 output.setYear(simYear);
@@ -168,6 +180,9 @@ public class Simulator extends Observable {
 
                 output.setHeatingType(building.getHeatingType());
                 output.setRenovationCost(building.getAccumulatedRenovationCosts());
+
+                output.setResidentialArea(building.getResidentialFloorSpace());
+                output.setCombinedArea(combinedArea);
 
                 return output;
             }).collect(Collectors.toList());
@@ -211,7 +226,19 @@ public class Simulator extends Observable {
         //mod1.setTargetBuildingsTypes(Arrays.asList("EFH_C", "EFH_I", "EFH_B", "EFH_G", "EFH_A", "EFH_F", "EFH_J", "EFH_K", "EFH_L", "EFH_H", "EFH_E", "EFH_D"));
         //modifiers.add(mod1);
 
-        SimulationParameter parameter = new SimulationParameter(name, simStop, modifiers);
+        // CO2 Factors for SimulationParameter
+        CO2FactorsData fa1 = new CO2FactorsData(HeatingType.CONDENSING_BOILER, 201d, 201d, 201d);
+        CO2FactorsData fa2 = new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR, 201d, 201d, 201d);
+        CO2FactorsData fa3 = new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR_HEAT_RECOVERY, 201d, 201d, 201d);
+        CO2FactorsData fa4 = new CO2FactorsData(HeatingType.DISTRICT_HEAT, 291.6d, 215d, 160d);
+        CO2FactorsData fa5 = new CO2FactorsData(HeatingType.DISTRICT_HEAT_HEAT_RECOVERY, 291.6d, 215d, 160d);
+        CO2FactorsData fa6 = new CO2FactorsData(HeatingType.HEAT_PUMP_HEAT_RECOVERY, 617d, 402d, 231d);
+        CO2FactorsData fa7 = new CO2FactorsData(HeatingType.LOW_TEMPERATURE_BOILER, 201d, 201d, 201d);
+        CO2FactorsData fa8 = new CO2FactorsData(HeatingType.PELLETS, 23d, 23d, 23d);
+        CO2FactorsData fa9 = new CO2FactorsData(HeatingType.PELLETS_SOLAR_HEAT_RECOVERY, 23d, 23d, 23d);
+        List<CO2FactorsData> yearlyCO2Factors = new ArrayList<>(Arrays.asList(fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9));
+
+        SimulationParameter parameter = new SimulationParameter(name, simStop, modifiers, yearlyCO2Factors, 2030, 2050);
 
         // Add special support for Guava (Google) datatype for Jackson
         //ObjectMapper mapper = new ObjectMapper().registerModule(new GuavaModule());
@@ -222,11 +249,23 @@ public class Simulator extends Observable {
         scoringMethods.add(new CO2EmissionFactor());
         scoringMethods.add(new CO2EmissionSquareMeterFactor());
 
-        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2));
+        HeatingSystemExchangeRate rate3 = new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate4 = new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate5 = new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate6 = new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate7 = new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate8 = new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2, rate3, rate4, rate5, rate6, rate7, rate8));
 
         IRenovationStrategy renovationStrategy = new RenovationHeatExchangeRateStrategy(2.0, 0.0, rates);
 

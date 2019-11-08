@@ -7,7 +7,6 @@ import com.google.common.collect.Range;
 import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.model.HeatingType;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
-import de.hawhh.gewiss.get.simulator.db.dao.SQLiteBuildingDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -27,7 +26,7 @@ import java.util.logging.Logger;
 /**
  * Controller for the Modifier.fxml view.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class ModifierController {
 
@@ -47,6 +46,8 @@ public class ModifierController {
     private CheckTreeView<String> locationCheckTree;
     @FXML
     private CheckTreeView<String> typeCheckTree;
+    @FXML
+    private CheckTreeView<String> ownerCheckTree;
     @FXML
     private Slider modifierImpact;
     @FXML
@@ -68,7 +69,6 @@ public class ModifierController {
 
     public void init(InputController parentController) {
         inputController = parentController;
-        SQLiteBuildingDAO buildingDAO = new SQLiteBuildingDAO();
 
         modifierName.focusedProperty().addListener((arg0, oldValue, newValue) -> {
             if (!newValue) { //when focus lost
@@ -80,6 +80,7 @@ public class ModifierController {
         initTextFieldValidators();
         initLocationCheckTree();
         initTypeCheckTree();
+        initOwnerCheckTree();
     }
 
     private void initTextFieldValidators() {
@@ -193,6 +194,18 @@ public class ModifierController {
         typeCheckTree.setRoot(root);
     }
 
+    private void initOwnerCheckTree() {
+        CheckBoxTreeItem<String> root = new CheckBoxTreeItem<>("All");
+        root.setExpanded(true);
+
+        inputController.getBuildingOwnershipTypes().forEach(owner -> {
+            CheckBoxTreeItem<String> ot = new CheckBoxTreeItem<>(owner);
+            root.getChildren().add(ot);
+        });
+
+        ownerCheckTree.setRoot(root);
+    }
+
     /**
      * Fetches the input from the UI and builds a {@link Modifier} by creating the according conditions for the filled input fields.
      *
@@ -229,6 +242,12 @@ public class ModifierController {
             }
             if (!buildingTypes.isEmpty()) {
                 modifier.setTargetBuildingsTypes(buildingTypes);
+            }
+
+            // Ownership Types
+            List<String> ownershipTypes = getSelectedOwnershipTypes();
+            if (!ownershipTypes.isEmpty()) {
+                modifier.setTargetOwnershipTypes(ownershipTypes);
             }
 
             // Construction year
@@ -293,23 +312,38 @@ public class ModifierController {
 
     private List<String> getSelectedQuarters() {
         List<String> quarters = new ArrayList<>();
-        locationCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty())).forEachOrdered((item) -> quarters.add(item.getValue()));
+        locationCheckTree.getCheckModel().getCheckedItems().stream()
+            .filter((item) -> (item.getChildren().isEmpty()))
+            .forEachOrdered((item) -> quarters.add(item.getValue()));
 
         return quarters;
     }
 
     private List<String> getSelectedResidentialBuildingTypes() {
         List<String> types = new ArrayList<>();
-        typeCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.RESIDENTIAL_BUILDINGS))).forEachOrdered((item) -> types.add(item.getValue()));
+        typeCheckTree.getCheckModel().getCheckedItems().stream()
+            .filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.RESIDENTIAL_BUILDINGS)))
+            .forEachOrdered((item) -> types.add(item.getValue()));
 
         return types;
     }
 
     private List<String> getSelectedNonResidentialBuildingTypes() {
         List<String> types = new ArrayList<>();
-        typeCheckTree.getCheckModel().getCheckedItems().stream().filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.NON_RESIDENTIAL_BUILDINGS))).forEachOrdered((item) -> types.add(item.getValue()));
+        typeCheckTree.getCheckModel().getCheckedItems().stream()
+            .filter((item) -> (item.getChildren().isEmpty() && item.getParent().getValue().equals(InputController.NON_RESIDENTIAL_BUILDINGS)))
+            .forEachOrdered((item) -> types.add(item.getValue()));
 
         return types;
+    }
+
+    private List<String> getSelectedOwnershipTypes() {
+        List<String> owners = new ArrayList<>();
+        ownerCheckTree.getCheckModel().getCheckedItems().stream()
+            .filter((item) -> (item.getChildren().isEmpty()))
+            .forEachOrdered((item) -> owners.add(item.getValue()));
+
+        return owners;
     }
 
     @FXML
@@ -409,6 +443,11 @@ public class ModifierController {
         if (modifier.getTargetBuildingsTypes() != null) {
             selectCheckTreeItem(typeCheckTree.getRoot(), modifier.getTargetBuildingsTypes());
         }
+
+        // Ownership types
+        if (modifier.getTargetOwnershipTypes() != null) {
+            selectCheckTreeItem(ownerCheckTree.getRoot(), modifier.getTargetOwnershipTypes());
+        }
     }
 
     private void selectCheckTreeItem(TreeItem<String> root, Collection<String> values) {
@@ -432,7 +471,7 @@ public class ModifierController {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error during Duplication of Modifier");
             alert.setHeaderText("Modifier Duplication Error");
-            alert.setContentText("An error occured during modifier duplication. Please check if the required fields (duration) are filled out and if the other text fields are filled with meaningful input.");
+            alert.setContentText("An error occurred during modifier duplication. Please check if the required fields (duration) are filled out and if the other text fields are filled with meaningful input.");
 
             alert.showAndWait();
         }

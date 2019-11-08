@@ -5,7 +5,7 @@ import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.RenovationLevel;
 
 /**
- * Score a building according to it's CO2 emission.
+ * Score a building according to its CO2 emission.
  *
  * @author Thomas Preisler
  */
@@ -20,7 +20,7 @@ public class CO2EmissionFactor implements ScoringMethod {
     @Override
     public Double calcBaseScore(Building building, Integer simYear) {
         if (!building.getRenovationLevel().equals(RenovationLevel.GOOD_RENOVATION)) {
-            return energyCalculator.calcCO2Emission(building);
+            return energyCalculator.calcCO2Emission(building, simYear);
         } else {
             return -1d;
         }

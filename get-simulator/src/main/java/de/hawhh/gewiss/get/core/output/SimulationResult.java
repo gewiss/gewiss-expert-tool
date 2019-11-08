@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @Data
 public class SimulationResult {
 
+    private Long seed;
     private String name;
     private String parameter;
     private Multimap<Integer, SimulationOutput> output = MultimapBuilder.treeKeys().arrayListValues().build();

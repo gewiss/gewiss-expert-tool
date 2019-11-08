@@ -32,8 +32,8 @@ public class SimulationResultDAO {
     /**
      * Save the given {@link SimulationResult} and return the created ID (key).
      *
-     * @param sr
-     * @return
+     * @param sr SimulationResult Object
+     * @return created ID key
      */
     public Integer save(SimulationResult sr) {
         Integer key = null;
@@ -85,6 +85,8 @@ public class SimulationResultDAO {
             mapString("heating_system", SimulationOutput::getHeatingTypeString);
             mapDouble("renovation_cost", SimulationOutput::getRenovationCost);
             mapDouble("co2_emission", SimulationOutput::getCo2Emission);
+            mapDouble("residential_area", SimulationOutput:: getResidentialArea);
+            mapDouble("combined_area", SimulationOutput::getCombinedArea);
         }
     }
 }

@@ -1,5 +1,5 @@
 # GET (GEWISS Expert Tool)
-The GEWISS Expert Tool (GET) is a simulation tool developed by [Thomas Preisler](mailto:thomas.preisler@haw-hamburg.de) and [Nils Weiss](mailto:nils.weiss@haw-hamburg.de) from the [HAW Hamburg](https://www.haw-hamburg.de) as part of the name giving [GEWISS](http://gewiss.haw-hamburg.de/) Project. The data model as well as the actual data is provided by  [Ivan Dochev](mailto:ivan.dochev@hcu-hamburg.de) from the [HCU Hamburg](https://www.hcu-hamburg.de/). Additional contributers are [Arjun Jamil](mailto:arjun.jamil@haw-hamburg.de) (HAW Hamburg, simulation logic and UI/UX design), Ev Köhler (HAW Hamburg, simulation logic) and [Hannes Seller](mailto:hannes.seller@hcu-hamburg.de) (HCU Hamburg, simulation logic). The project is lead by [Wolfgang Renz](mailto:wolfgang.renz@haw-hamburg.de) (HAW Hamburg) and [Irene Peters](mailto:irene.peters@hcu-hamburg.de) (HCU Hamburg).
+The GEWISS Expert Tool (GET) is a simulation tool developed by [Thomas Preisler](mailto:thomas.preisler@haw-hamburg.de), [Nils Weiss](mailto:nils.weiss@haw-hamburg.de) and [Antony Sotirov](mailto:antony.sotirov@haw-hamburg.de) from the [HAW Hamburg](https://www.haw-hamburg.de) as part of the name giving [GEWISS](http://gewiss.haw-hamburg.de/) Project. The data model as well as the actual data is provided by  [Ivan Dochev](mailto:ivan.dochev@hcu-hamburg.de) from the [HCU Hamburg](https://www.hcu-hamburg.de/). Additional contributers are [Arjun Jamil](mailto:arjun.jamil@haw-hamburg.de) (HAW Hamburg, simulation logic and UI/UX design), Ev Köhler (HAW Hamburg, simulation logic) and [Hannes Seller](mailto:hannes.seller@hcu-hamburg.de) (HCU Hamburg, simulation logic). The project is lead by [Wolfgang Renz](mailto:wolfgang.renz@haw-hamburg.de) (HAW Hamburg) and [Irene Peters](mailto:irene.peters@hcu-hamburg.de) (HCU Hamburg).
 
 The GET-Icon is made by [Freepik](www.freepik.com) from www.flaticon.com.
 
@@ -49,6 +49,7 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | bj_alk_dt     | Integer   | Year of construction |
 | dt_san_year   | Integer   | Last year of renovation |
 | dt_heiztyp    | String    | Heating system type |
+| dt_eigentum   | String    | Building Ownership Information |
 | iwu_typ       | String    | Residential building type |
 | nwg_typ       | String    | Non-residential building type |
 | bak_fin       | String    | Construction age class |
@@ -85,17 +86,19 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | id               | Integer   | Unique table id |
 | BUILD_TYPE       | String    | Building type |
 | RENOVATION_LEVEL | Integer   | 0,1,2 for baseline, EnEV 2014, Passive house |
-| HEATING_SYSTEM   | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| HEATING_SYSTEM   | String    | type of heating system, e.g. "DISTRICT HEATING" |
 | FINAL_ENERGY     | Double    | Demand for space heating and domestic hot water as final energy (kWh/m<sup>2</sup>) |
 
 #### Table primary_energy_factors
 | Column Name               | Type      | Description |
 |-------------------------- |---------- |-------------|
 | id                        | Integer   | Unique table id |
-| HEATING_SYSTEM            | String    | type of heating system, f.ex "DISTRICT HEATING" |
-| ENERGY_SOURCE_TYPE        | String    | type of energy source, f.ex "NATURAL_GAS", used only for information |
+| HEATING_SYSTEM            | String    | type of heating system, e.g. "DISTRICT HEATING" |
+| ENERGY_SOURCE_TYPE        | String    | type of energy source, e.g. "NATURAL_GAS", used only for information |
 | PRIMARY_ENERGY_FACTOR     | Double    | Primary energy factor of the heating system type (ratio) |
-| CO2                       | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>|
+| CO2_2019                  | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>) for 2019 (current) |
+| CO2_2030                  | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>), projection for 2030 |
+| CO2_2050                  | Double    | CO<sub>2</sub> factor for the heating system type (g/kWh<sub>final energy</sub>), projection for 2050 |
 
 #### Table costs_building_shell
 | Column Name   | Type      | Description |
@@ -109,8 +112,8 @@ The following briefly describes the SQL-tables required for the simulation tool.
 | Column Name   | Type      | Description |
 |-------------  |---------- |-------------|
 | id               | Integer   | Unique table id |
-| HEAT_LOAD_kW     | Integer   | The peak heat load needed, f.ex. 5, 15, 25 kW   |
-| HEATING_SYSTEM   | String    | type of heating system, f.ex "DISTRICT HEATING" |
+| HEAT_LOAD_kW     | Integer   | The peak heat load needed, e.g. 5, 15, 25 kW   |
+| HEATING_SYSTEM   | String    | type of heating system, e.g. "DISTRICT HEATING" |
 | COST             | Double    | total cost (euro) for exchanging the old heating system with this system |
 
 ## Building and Running the Application
@@ -165,3 +168,20 @@ mvn jfx:build-native
 Keep in mind that this might require additional third party tools depending on your operating system. Maven will state on the command lines which tools are needed if not already installed and a web search should quickly lead to the required tools and instructions on how to install them.
 
 Afterwards you can find the native executable as well as an installer for your platform in the folder `get-ui/target/jfx/native`.
+
+
+#### Miscellaneous
+* Updating the values in the GUI tables ("CO<sub>2</sub> Factors in g/kWh" and "Heating System Exchange Control Matrix") requires double clicking a single cell and then pressing enter after the new value has been inserted.
+* The starting year of the simulation is currently hard-set in the SimulationParameters class (FIRST\_YEAR = 2019).
+* When data is exported using the GUI (either \*.csv or \*.xlsx file format), the SEED for the particular simulation run is appended at the name of the file name.
+* The possible renovation level transitions for the "Heating System Exchange Control Matrix" are 0 to 1, 0 to 2, and 1 to 2. The renovation level transitions from 0 to 2 and 1 to 2 have the same rate of change.
+* Below is a small table showcasing the different acronyms used for the Renovation Levels.
+#### Acronyms for Renovation Levels
+| UI Table ENUMs    | Other names          | Type                | Description            |
+|-------------------|----------------------|---------------------|------------------------|
+| N/A               | Unrenovated          | Renovation Level 0  | Not renovated          |
+| \*\*\*\_ENEV      | EnEV 2014            | Renovation Level 1  | Basic renovation       | 
+| \*\*\*\_PASSIVE   | Passive House        | Renovation Level 2  | Good  renovation       | 
+
+\*\*\*: RES for Residential; NRES for Non-Residential.
+

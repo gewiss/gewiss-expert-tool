@@ -1,11 +1,9 @@
 package de.hawhh.gewiss.get.simulator;
 
-import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
-import de.hawhh.gewiss.get.core.input.InputValidationException;
-import de.hawhh.gewiss.get.core.input.Modifier;
-import de.hawhh.gewiss.get.core.input.SimulationParameter;
+import de.hawhh.gewiss.get.core.input.*;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.RenovationType;
 import de.hawhh.gewiss.get.core.output.SimulationResult;
 import de.hawhh.gewiss.get.simulator.model.ScoredBuilding;
 import de.hawhh.gewiss.get.simulator.renovation.IRenovationStrategy;
@@ -42,25 +40,52 @@ public class SimulatorTest {
         Integer simStop = 2020;
         String name = "TestRun-" + LocalDateTime.now();
 
+        // modifiers for SimulationParameter
         List<Modifier> modifiers = new ArrayList<>();
         Modifier mod1 = new Modifier("OneFamilyHousesInAltona", 2020, 2030, 2d);
         mod1.setTargetQuarters(Arrays.asList("Nienstedten", "Othmarschen", "Ottensen", "Altona-Altstadt", "Rissen", "Blankenese", "Osdorf", "Iserbrook", "Groß Flottbek",
                 "Bahrenfeld", "Altona-Nord", "Sternschanze", "Sülldorf", "Lurup"));
         mod1.setTargetBuildingsTypes(Arrays.asList("EFH_C", "EFH_I", "EFH_B", "EFH_G", "EFH_A", "EFH_F", "EFH_J", "EFH_K", "EFH_L", "EFH_H", "EFH_E", "EFH_D"));
+        mod1.setTargetOwnershipTypes(Arrays.asList("PRIVAT", "UNKNOWN"));
         modifiers.add(mod1);
 
-        this.simParams = new SimulationParameter(name, simStop, modifiers);
+        // CO2 Factors for SimulationParameter
+        CO2FactorsData fa1 = new CO2FactorsData(HeatingType.CONDENSING_BOILER, 201d, 201d, 201d);
+        CO2FactorsData fa2 = new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR, 201d, 201d, 201d);
+        CO2FactorsData fa3 = new CO2FactorsData(HeatingType.CONDENSING_BOILER_SOLAR_HEAT_RECOVERY, 201d, 201d, 201d);
+        CO2FactorsData fa4 = new CO2FactorsData(HeatingType.DISTRICT_HEAT, 291.6d, 215d, 160d);
+        CO2FactorsData fa5 = new CO2FactorsData(HeatingType.DISTRICT_HEAT_HEAT_RECOVERY, 291.6d, 215d, 160d);
+        CO2FactorsData fa6 = new CO2FactorsData(HeatingType.HEAT_PUMP_HEAT_RECOVERY, 617d, 402d, 231d);
+        CO2FactorsData fa7 = new CO2FactorsData(HeatingType.LOW_TEMPERATURE_BOILER, 201d, 201d, 201d);
+        CO2FactorsData fa8 = new CO2FactorsData(HeatingType.PELLETS, 23d, 23d, 23d);
+        CO2FactorsData fa9 = new CO2FactorsData(HeatingType.PELLETS_SOLAR_HEAT_RECOVERY, 23d, 23d, 23d);
+        List<CO2FactorsData> yearlyCO2Factors = new ArrayList<>(Arrays.asList(fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9));
+
+
+        this.simParams = new SimulationParameter(name, simStop, modifiers, yearlyCO2Factors, 2030, 2050);
 
         this.scoringMethods = new ArrayList<>();
         this.scoringMethods.add(new BuildingAgeFactor());
         this.scoringMethods.add(new CO2EmissionFactor());
         this.scoringMethods.add(new CO2EmissionSquareMeterFactor());
 
-        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate1 = new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+        HeatingSystemExchangeRate rate2 = new HeatingSystemExchangeRate(RenovationType.RES_ENEV, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
                 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
-        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2));
+        HeatingSystemExchangeRate rate3 = new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate4 = new HeatingSystemExchangeRate(RenovationType.RES_PASSIVE, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate5 = new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate6 = new HeatingSystemExchangeRate(RenovationType.NRES_ENEV, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate7 = new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.LOW_TEMPERATURE_BOILER, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        HeatingSystemExchangeRate rate8 = new HeatingSystemExchangeRate(RenovationType.NRES_PASSIVE, HeatingType.DISTRICT_HEAT, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0,
+                100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0, 100.0 / 9.0);
+        List<HeatingSystemExchangeRate> rates = new ArrayList<>(Arrays.asList(rate1, rate2, rate3, rate4, rate5, rate6, rate7, rate8));
 
         this.renovationStrategy = new RenovationHeatExchangeRateStrategy(2.0, 0.0, rates);
 
@@ -77,7 +102,6 @@ public class SimulatorTest {
             e.printStackTrace();
         }
 
-        Assert.assertNotNull(simulationResult);
         Assert.assertNotNull(simulationResult.getBuildings());
         Assert.assertNotNull(simulationResult.getOutput());
         Assert.assertNotNull(simulationResult.getName());

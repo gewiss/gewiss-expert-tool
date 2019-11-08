@@ -15,7 +15,15 @@
 <?import javafx.scene.text.Text?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="289.0" prefWidth="1400.0" style="-fx-background-color: WhiteSmoke;" stylesheets="@../styles/bootstrap3.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.hawhh.gewiss.get.fx.controller.InitialParametersController">
+<?import javafx.scene.control.Accordion?>
+<AnchorPane
+    maxHeight="-Infinity" maxWidth="-Infinity"
+    minHeight="-Infinity" minWidth="-Infinity"
+    prefHeight="522.0" prefWidth="1400.0"
+    style="-fx-background-color: WhiteSmoke;" stylesheets="@../styles/bootstrap3.css"
+    xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="de.hawhh.gewiss.get.fx.controller.InitialParametersController">
+
     <children>
         <Text layoutX="14.0" layoutY="37.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Initial Parameters:">
             <font>
@@ -146,26 +154,47 @@
                 <Insets />
             </opaqueInsets>
         </GridPane>
-        <TitledPane animated="false" collapsible="false" layoutX="15.0" layoutY="127.0" prefHeight="153.0" prefWidth="1371.0" text="Heating System Exchange Control">
-            <content>
-                <TableView fx:id="heatingSystemExchangeTable" editable="true" maxWidth="1630.0" minWidth="1227.0" prefHeight="140.0" prefWidth="1369.0">
-                    <columns>
-                        <TableColumn fx:id="oldType" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Old\New" />
-                        <TableColumn fx:id="lowTempBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Low Temp Boiler" />
-                        <TableColumn fx:id="districtHeatRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat" />
-                        <TableColumn fx:id="condensingBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Condensing Boiler" />
-                        <TableColumn fx:id="condBoilerSolarRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar" />
-                        <TableColumn fx:id="pelletsRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Pellets" />
-                        <TableColumn fx:id="heatPumpHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Heat Pump HR" />
-                        <TableColumn fx:id="pelletsSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Pellets Solar HR" />
-                        <TableColumn fx:id="districtHeatHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat HR" />
-                        <TableColumn fx:id="condBoilerSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar HR" />
-                    </columns>
-                </TableView>
-            </content>
-         <font>
-            <Font name="System Bold" size="15.0" />
-         </font>
-        </TitledPane>
+        <Accordion fx:id="accordion" layoutX="15.0" layoutY="127.0" minHeight="-Infinity" prefHeight="375.0">
+            <panes>
+                <TitledPane fx:id="co2Pane" animated="false" expanded="true" text="CO2 Factors in g/kWh">
+                    <content>
+                        <TableView fx:id="cO2FactorsTable" editable="true" maxWidth="840.0" minWidth="700.0" prefWidth="790.0">
+                            <columns>
+                                <TableColumn fx:id="heatingSystem" editable="false" maxWidth="350.0" minWidth="320.0" prefWidth="280.0"/>
+                                <TableColumn fx:id="startEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0"/>
+                                <TableColumn fx:id="midEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0"/>
+                                <TableColumn fx:id="finalEmissions" editable="true" maxWidth="170.0" minWidth="150.0" prefWidth="170.0"/>
+                            </columns>
+                        </TableView>
+                    </content>
+                    <font>
+                        <Font name="System Bold" size="15.0"/>
+                    </font>
+                </TitledPane>
+                <TitledPane animated="false" expanded="false" prefWidth="1371.0" text="Heating System Exchange Control Matrix">
+                    <content>
+                        <TableView fx:id="heatingSystemExchangeTable" editable="true" maxWidth="1630.0" minWidth="1227.0" prefWidth="1369.0">
+                            <columns>
+                                <TableColumn fx:id="renType" editable="false" maxWidth="150.0" minWidth="130.0" prefWidth="200.0" text="Renovation Type"/>
+                                <TableColumn fx:id="oldType" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Old\New"/>
+                                <TableColumn fx:id="lowTempBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Low Temp Boiler"/>
+                                <TableColumn fx:id="districtHeatRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat"/>
+                                <TableColumn fx:id="condensingBoilerRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Condensing Boiler"/>
+                                <TableColumn fx:id="condBoilerSolarRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar"/>
+                                <TableColumn fx:id="pelletsRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Pellets"/>
+                                <TableColumn fx:id="heatPumpHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Heat Pump HR"/>
+                                <TableColumn fx:id="pelletsSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Pellets Solar HR"/>
+                                <TableColumn fx:id="districtHeatHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="District Heat HR"/>
+                                <TableColumn fx:id="condBoilerSolarHRRate" editable="true" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" text="Cond. boiler Solar HR"/>
+                            </columns>
+                        </TableView>
+                    </content>
+                    <font>
+                        <Font name="System Bold" size="15.0"/>
+                    </font>
+                </TitledPane>
+            </panes>
+        </Accordion>
     </children>
+
 </AnchorPane>

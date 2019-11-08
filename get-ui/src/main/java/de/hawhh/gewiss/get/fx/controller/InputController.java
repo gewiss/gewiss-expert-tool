@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
+import de.hawhh.gewiss.get.core.input.CO2FactorsData;
 import de.hawhh.gewiss.get.core.input.HeatingSystemExchangeRate;
 import de.hawhh.gewiss.get.core.input.Modifier;
 import de.hawhh.gewiss.get.core.input.SimulationParameter;
@@ -48,7 +49,7 @@ import java.util.logging.Logger;
 /**
  * FXML Controller class for the Input.fxml.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 @SuppressWarnings("ALL")
 public class InputController implements Observer {
@@ -77,6 +78,8 @@ public class InputController implements Observer {
     private Multimap<String, String> locationMap;
     // Multimap containing IWU and Ecofys as keys and the according building types as values
     private Multimap<String, String> buildingTypeMap;
+    // Ordered set of unique building owners
+    private List<String> buildingOwnershipTypes;
 
     private final static Logger LOGGER = Logger.getLogger(InputController.class.getName());
 
@@ -98,6 +101,8 @@ public class InputController implements Observer {
         initLocationMap();
         buildingTypeMap = TreeMultimap.create();
         initBuildingTypeMap();
+        buildingOwnershipTypes = new ArrayList<>();
+        initBuildingOwnershipTypes();
 
         initialParametersController.init();
         firstModifierController.init(this);
@@ -211,12 +216,20 @@ public class InputController implements Observer {
         buildingTypeMap.putAll(NON_RESIDENTIAL_BUILDINGS, buildingDAO.getNonResidentialBuildingTypes());
     }
 
+    private void initBuildingOwnershipTypes() {
+        buildingOwnershipTypes.addAll(buildingDAO.getOwnershipTypes());
+    }
+
     public Multimap<String, String> getLocationMap() {
         return locationMap;
     }
 
     public Multimap<String, String> getBuildingTypeMap() {
         return buildingTypeMap;
+    }
+
+    public List<String> getBuildingOwnershipTypes() {
+        return buildingOwnershipTypes;
     }
 
     @FXML
@@ -273,7 +286,10 @@ public class InputController implements Observer {
                         modifiers.add(mc.getModifier());
                     }
                 });
-                SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers);
+                List<CO2FactorsData> yearlyCO2Data = initialParametersController.getCO2FactorTableData();
+
+                SimulationParameter parameters = new SimulationParameter(name, lastYear, modifiers, yearlyCO2Data,
+                    InitialParametersController.MID_CO2_YEAR, InitialParametersController.FINAL_CO2_YEAR);
 
                 // Ranking/scoring methods
                 List<ScoringMethod> scoringMethods = new ArrayList<>();
@@ -285,7 +301,7 @@ public class InputController implements Observer {
                     scoringMethods.add(new CO2EmissionSquareMeterFactor());
                 }
                 
-                // Renovation strategy
+                // Renovation strategy (hard-coded to RenovationHeatExchangeRateStrategy!)
                 Double renovationRate = initialParametersController.getRenovationRate();
                 Double passiveHouseRate = initialParametersController.getPassiveHouseRate();
                 List<HeatingSystemExchangeRate> heatingSystemExchangeRates = initialParametersController.getHeatingSystemExchangeRates();

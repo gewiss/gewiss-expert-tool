@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /**
  * Class implementing the BuildingDAO interface for a SQLite database.
  *
- * @author Thomas Preisler
+ * @author Thomas Preisler, Antony Sotirov
  */
 public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
 
@@ -42,14 +42,15 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
         List<Building> buildings = new ArrayList<>();
 
         // WG + NWG
-        String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist"
+        String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt,"
+                + "dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum"
                 + " FROM gewiss_buildings_v_1 WHERE nwg_typ NOT LIKE 'kein_Bedarf' AND NOT(iwu_typ LIKE '_' AND nwg_typ LIKE '_')";
 
         // just WG
-        //String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist FROM gewiss_buildings_v_1 WHERE iwu_typ NOT LIKE '_'";
-        
+        //String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum FROM gewiss_buildings_v_1 WHERE iwu_typ NOT LIKE '_'";
+
         // just NWG
-        //String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist FROM gewiss_buildings_v_1 WHERE nwg_typ NOT LIKE '_' AND nwg_typ NOT LIKE 'kein_Bedarf'";
+        //String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp,iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, det_eigentum FROM gewiss_buildings_v_1 WHERE nwg_typ NOT LIKE '_' AND nwg_typ NOT LIKE 'kein_Bedarf'";
 
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
@@ -72,12 +73,14 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 String nonResidentialType = rs.getString("nwg_typ");
                 String clusterID = rs.getString("cluster");
                 Integer districtHeatingOutletDistance = rs.getInt("dt_fw_dist");
+                String ownership = rs.getString("dt_eigentum");
                 ConstructionAgeClass constructionAgeClass = constructionAgeClasses.get(rs.getString("bak_fin"));
                 String heatingTypeString = rs.getString("dt_heiztyp");
                 HeatingType heatingType = HeatingType.valueOf(heatingTypeString);
 
-                Building building = createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district, quarter, statisticalArea, cityBlock,
-                        yearOfConstruction, yearOfRenovation, residentialType, nonResidentialType, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance);
+                Building building = createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district,
+                        quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
+                        nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance);
                 if (building != null) {
                     buildings.add(building);
                 }
@@ -96,58 +99,6 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
     }
 
     /**
-     * Creates a buidling from the given data.
-     *
-     * @param alkisID ALKIS Id
-     * @param geomWkt WKT String representation of the geometry
-     * @param residentialFloorSpace residential floor space (Wohnfläche)
-     * @param nonResidentialFloorSpace non residential floor space (Nutzfläche)
-     * @param district district (Bezirk)
-     * @param quarter district (Stadtteil)
-     * @param statisticalArea statistical area (statistisches Gebiet)
-     * @param cityBlock city block (Baublock)
-     * @param yearOfConstruction year of construction
-     * @param yearOfRenovation year of (last) renovation
-     * @param residentialType residential building type (IWU)
-     * @param nonResidentialType non residential building type (Ecofys)
-     * @param constructionAgeClass construction age class (Baualtersklasse)
-     * @param clusterID
-     * @param heatingType 
-     * @param districtHeatingOutletDistance distance in meter to the nearest district heating outlet
-     * @return
-     */
-    private Building createBuilding(String alkisID, String geomWkt, Double residentialFloorSpace, Double nonResidentialFloorSpace, String district, String quarter,
-            String statisticalArea, String cityBlock, Integer yearOfConstruction, Integer yearOfRenovation, String residentialType, String nonResidentialType,
-            ConstructionAgeClass constructionAgeClass, String clusterID, HeatingType heatingType, Integer districtHeatingOutletDistance) {
-        Geometry geometry = null;
-        try {
-            geometry = GeometryHelper.convertToJTSPolygon(geomWkt);
-        } catch (ParseException e) {
-            LOGGER.severe(e.getMessage());
-        }
-
-        Building building = new Building();
-        building.setAlkisID(alkisID);
-        building.setGeometry(geometry);
-        building.setResidentialFloorSpace(residentialFloorSpace);
-        building.setNonResidentialFloorSpace(nonResidentialFloorSpace);
-        building.setDistrict(district);
-        building.setQuarter(quarter);
-        building.setStatisticalArea(statisticalArea);
-        building.setCityBlock(cityBlock);
-        building.setYearOfConstruction(yearOfConstruction);
-        building.setYearOfRenovation(yearOfRenovation);
-        building.setResidentialType(residentialType);
-        building.setNonResidentialType(nonResidentialType);
-        building.setConstructionAgeClass(constructionAgeClass);
-        building.setClusterID(clusterID);
-        building.setHeatingType(heatingType);
-        building.setDistrictHeatingOutletDistance(districtHeatingOutletDistance);
-
-        return building;
-    }
-
-    /**
      * Find and return the {@link Building} with the given Id.
      *
      * @param buildingId the given building id
@@ -155,7 +106,8 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
      */
     @Override
     public Building findById(String buildingId) {
-        String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt, dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist"
+        String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt,"
+                + "dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum"
                 + " FROM gewiss_buildings_v_1 WHERE alkis_id = ?";
 
         try {
@@ -178,18 +130,77 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 String nonResidentialType = rs.getString("nwg_typ");
                 String clusterID = rs.getString("cluster");
                 Integer districtHeatingOutletDistance = rs.getInt("dt_fw_dist");
+                String ownership = rs.getString("dt_eigentum");
                 ConstructionAgeClass constructionAgeClass = constructionAgeClasses.get(rs.getString("bak_fin"));
                 String heatingTypeString = rs.getString("dt_heiztyp");
                 HeatingType heatingType = HeatingType.valueOf(heatingTypeString);
 
-                return createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district, quarter, statisticalArea, cityBlock,
-                        yearOfConstruction, yearOfRenovation, residentialType, nonResidentialType, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance);
+                return createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district,
+                    quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
+                    nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance);
             }
         } catch (SQLException e) {
             Logger.getLogger(SQLiteBuildingDAO.class.getName()).log(Level.SEVERE, null, e);
         }
 
         return null;
+    }
+
+    /**
+     * Creates a building from the given data.
+     *
+     * @param alkisID ALKIS Id
+     * @param geomWkt WKT String representation of the geometry
+     * @param residentialFloorSpace residential floor space (Wohnfläche)
+     * @param nonResidentialFloorSpace non residential floor space (Nutzfläche)
+     * @param district district (Bezirk)
+     * @param quarter district (Stadtteil)
+     * @param statisticalArea statistical area (statistisches Gebiet)
+     * @param cityBlock city block (Baublock)
+     * @param yearOfConstruction year of construction
+     * @param yearOfRenovation year of (last) renovation
+     * @param residentialType residential building type (IWU)
+     * @param nonResidentialType non residential building type (Ecofys)
+     * @param ownership the owner of the building (Eigentum)
+     * @param constructionAgeClass construction age class (Baualtersklasse)
+     * @param clusterID
+     * @param heatingType
+     * @param districtHeatingOutletDistance distance in meter to the nearest district heating outlet
+     * @return building object
+     */
+    private Building createBuilding(String alkisID, String geomWkt, Double residentialFloorSpace,
+                                    Double nonResidentialFloorSpace, String district, String quarter, String statisticalArea, String cityBlock,
+                                    Integer yearOfConstruction, Integer yearOfRenovation, String residentialType, String nonResidentialType,
+                                    String ownership, ConstructionAgeClass constructionAgeClass, String clusterID, HeatingType heatingType,
+                                    Integer districtHeatingOutletDistance) {
+
+        Geometry geometry = null;
+        try {
+            geometry = GeometryHelper.convertToJTSPolygon(geomWkt);
+        } catch (ParseException e) {
+            LOGGER.severe(e.getMessage());
+        }
+
+        Building building = new Building();
+        building.setAlkisID(alkisID);
+        building.setGeometry(geometry);
+        building.setResidentialFloorSpace(residentialFloorSpace);
+        building.setNonResidentialFloorSpace(nonResidentialFloorSpace);
+        building.setDistrict(district);
+        building.setQuarter(quarter);
+        building.setStatisticalArea(statisticalArea);
+        building.setCityBlock(cityBlock);
+        building.setYearOfConstruction(yearOfConstruction);
+        building.setYearOfRenovation(yearOfRenovation);
+        building.setResidentialType(residentialType);
+        building.setNonResidentialType(nonResidentialType);
+        building.setOwnership(ownership);
+        building.setConstructionAgeClass(constructionAgeClass);
+        building.setClusterID(clusterID);
+        building.setHeatingType(heatingType);
+        building.setDistrictHeatingOutletDistance(districtHeatingOutletDistance);
+
+        return building;
     }
 
     @Override
@@ -233,6 +244,30 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
             }
 
             return types;
+        } catch (SQLException ex) {
+            Logger.getLogger(SQLiteBuildingDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<String> getOwnershipTypes() {
+        try {
+            LOGGER.info("Getting all different building owners from SQLite DB");
+
+            List<String> owners = new ArrayList<>();
+
+            String sql = "select distinct(dt_eigentum) from gewiss_buildings_v_1 order by dt_eigentum";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String owner = rs.getString("dt_eigentum");
+                owners.add(owner);
+            }
+
+            return owners;
         } catch (SQLException ex) {
             Logger.getLogger(SQLiteBuildingDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
