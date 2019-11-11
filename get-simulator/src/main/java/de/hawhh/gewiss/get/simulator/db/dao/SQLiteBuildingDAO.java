@@ -73,6 +73,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 String nonResidentialType = rs.getString("nwg_typ");
                 String clusterID = rs.getString("cluster");
                 Integer districtHeatingOutletDistance = rs.getInt("dt_fw_dist");
+                Boolean accessDistrictHeating = rs.getBoolean("dt_fw_dist");
                 String ownership = rs.getString("dt_eigentum");
                 ConstructionAgeClass constructionAgeClass = constructionAgeClasses.get(rs.getString("bak_fin"));
                 String heatingTypeString = rs.getString("dt_heiztyp");
@@ -80,7 +81,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
 
                 Building building = createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district,
                         quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
-                        nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance);
+                        nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance, accessDistrictHeating);
                 if (building != null) {
                     buildings.add(building);
                 }
@@ -130,14 +131,15 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 String nonResidentialType = rs.getString("nwg_typ");
                 String clusterID = rs.getString("cluster");
                 Integer districtHeatingOutletDistance = rs.getInt("dt_fw_dist");
+                Boolean accessDistrictHeating = rs.getBoolean("dt_fw_dist");
                 String ownership = rs.getString("dt_eigentum");
                 ConstructionAgeClass constructionAgeClass = constructionAgeClasses.get(rs.getString("bak_fin"));
                 String heatingTypeString = rs.getString("dt_heiztyp");
                 HeatingType heatingType = HeatingType.valueOf(heatingTypeString);
 
                 return createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district,
-                    quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
-                    nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance);
+                        quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
+                        nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance, accessDistrictHeating);
             }
         } catch (SQLException e) {
             Logger.getLogger(SQLiteBuildingDAO.class.getName()).log(Level.SEVERE, null, e);
@@ -172,7 +174,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                                     Double nonResidentialFloorSpace, String district, String quarter, String statisticalArea, String cityBlock,
                                     Integer yearOfConstruction, Integer yearOfRenovation, String residentialType, String nonResidentialType,
                                     String ownership, ConstructionAgeClass constructionAgeClass, String clusterID, HeatingType heatingType,
-                                    Integer districtHeatingOutletDistance) {
+                                    Integer districtHeatingOutletDistance, Boolean accessDistrictHeating) {
 
         Geometry geometry = null;
         try {
@@ -199,6 +201,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
         building.setClusterID(clusterID);
         building.setHeatingType(heatingType);
         building.setDistrictHeatingOutletDistance(districtHeatingOutletDistance);
+        building.setAccessDistrictHeating(accessDistrictHeating);
 
         return building;
     }

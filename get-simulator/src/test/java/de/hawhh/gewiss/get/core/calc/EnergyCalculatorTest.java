@@ -27,7 +27,7 @@ public class EnergyCalculatorTest {
 
         this.testBuilding = new Building();
         this.testBuilding.setQuarter("Altona");
-        this.testBuilding.setDistrictHeatingOutletDistance(10);
+        this.testBuilding.setDistrictHeatingOutletDistance(1);
         this.testBuilding.setDistrict("Altona");
         this.testBuilding.setHeatingType(HeatingType.DISTRICT_HEAT);
         this.testBuilding.setResidentialType("EFH_A");

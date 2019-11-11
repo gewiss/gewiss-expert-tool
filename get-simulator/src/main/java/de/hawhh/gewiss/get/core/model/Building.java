@@ -31,12 +31,18 @@ public class Building {
     private String clusterID;
     private String heatingTypeString;
     private HeatingType heatingType;
+    // @TODO: districtHeatingOutletDistance: for deprecation, remove from Simulator (DAO, etc.) and as an UI input!
     private Integer districtHeatingOutletDistance;
+    private Boolean accessDistrictHeating;
     private Double accumulatedRenovationCosts = 0d;
 
     public Building() {
         this.renovationLevel = RenovationLevel.NO_RENOVATION;
         //this.energyCalculator = new EnergyCalculator();
+    }
+
+    public Boolean hasAccessDistrictHeating() {
+        return accessDistrictHeating;
     }
 
     /**
