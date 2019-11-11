@@ -173,10 +173,13 @@ Afterwards you can find the native executable as well as an installer for your p
 #### Miscellaneous
 * The  names of the SQLite databases for the GET are named "GEWISS_buildings.sqlite", "GEWISS_buildings_anonymized_for_testing.sqlite".
 * Updating the values in the GUI tables ("CO<sub>2</sub> Factors in g/kWh" and "Heating System Exchange Control Matrix") requires double clicking a single cell and then pressing enter after the new value has been inserted.
+* The transition rate to district heating systems depends on the dt_fw_dist field in the DB, which values of 0 (more than 50m away from an existing pipeline) and 1 (less than 50m to an existing pipeline).
+    * This eliminates the possibility of buildings with district heating in areas without access to district heating grids. The user can reclassify the DB field and control the behaviour.
+    * Internally, when the dt_fw_dist value of a building is 1, the transition matrix is taken as it is. If dt_fw_dist is 0, the district heating probability is becomes 0% and the rest of the matrix values are normalized to 100%. So the final split of the heating systems might not be the same as the split given in the input matrix! 
+
 * The starting year of the simulation is currently hard-set in the SimulationParameters class (FIRST\_YEAR = 2019).
 * When data is exported using the GUI (either \*.csv or \*.xlsx file format), the SEED for the particular simulation run is appended at the name of the file name.
-* The possible renovation level transitions for the "Heating System Exchange Control Matrix" are 0 to 1, 0 to 2, and 1 to 2. The renovation level transitions from 0 to 2 and 1 to 2 have the same rate of change.
-* Below is a small table showcasing the different acronyms used for the Renovation Levels.
+* The possible renovation level transitions for the "Heating System Exchange Control Matrix" are 0 to 1, 0 to 2, and 1 to 2. The renovation level transitions from 0 to 2 and 1 to 2 have the same rate of change. Below is a small table showcasing the different acronyms used for the Renovation Levels:
 #### Acronyms for Renovation Levels
 | UI Table ENUMs    | Other names          | Type                | Description            |
 |-------------------|----------------------|---------------------|------------------------|
@@ -184,5 +187,4 @@ Afterwards you can find the native executable as well as an installer for your p
 | \*\*\*\_ENEV      | EnEV 2014            | Renovation Level 1  | Basic renovation       | 
 | \*\*\*\_PASSIVE   | Passive House        | Renovation Level 2  | Good  renovation       | 
 
-\*\*\*: RES for Residential; NRES for Non-Residential.
-
+\*\*\*: RES for Residential buildings; NRES for Non-Residential buildings.
