@@ -296,6 +296,29 @@ public class EnergyCalculator {
     }
 
     /**
+     * Get the FinalEnergy parameter associated with a given building.
+     * @TODO: pass BuildingType parameter (Residential, Non-Residential) to reduce duplicate code in EnergyCalculator
+     * @param building
+     * @return final energy of a building based on ResidentialType, RenovationLevel and HeatingType.
+     */
+    public Double getBuildingFinalEnergy(Building building) {
+        if (building.getResidentialType() != null) {
+            HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
+                    building.getResidentialType(), building.getRenovationLevel(), building.getHeatingType()
+            );
+            return heatDemandFinalEnergy.getFinalEnergy();
+        } else if (building.getNonResidentialType() != null) {
+            HeatDemandFinalEnergy heatDemandFinalEnergy = (HeatDemandFinalEnergy) heatDemandFinalEnergyMap.get(
+                    building.getNonResidentialType(), building.getRenovationLevel(), building.getHeatingType()
+            );
+            return heatDemandFinalEnergy.getFinalEnergy();
+        }
+        
+        // default return value
+        return null;
+    }
+
+    /**
      * Calculate the heating exchange renovation costs for the given {@link Building} using the {@link CostsHeatingSystemDAO}.
      *
      * @param building

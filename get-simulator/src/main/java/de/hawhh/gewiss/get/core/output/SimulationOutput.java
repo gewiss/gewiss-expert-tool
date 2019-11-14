@@ -22,6 +22,7 @@ public class SimulationOutput {
     private Double co2Emission;
     private Double residentialArea;
     private Double combinedArea;
+    private Double finalEnergy;
 
     public String getRenovationLevelString() {
         return this.renovationLevel.toString();
@@ -29,5 +30,9 @@ public class SimulationOutput {
     
     public String getHeatingTypeString() {
         return this.heatingType.toString();
+    }
+
+    public Double getFinalEnergy() {
+        return finalEnergy;
     }
 }

@@ -155,7 +155,6 @@ public class Simulator extends Observable {
                 renovationStrategy.performRenovation(scoredBuildings, i, this.randomGenerator);
             }
 
-
             // Calc heat demand and store results
             List<SimulationOutput> outputs = buildings.stream().parallel().map(building -> {
                 SimulationOutput output = new SimulationOutput();
@@ -183,6 +182,14 @@ public class Simulator extends Observable {
 
                 output.setResidentialArea(building.getResidentialFloorSpace());
                 output.setCombinedArea(combinedArea);
+
+                Double finalEnergy = energyCalculator.getBuildingFinalEnergy(building);
+                if (finalEnergy != null) {
+                    output.setFinalEnergy(finalEnergy);
+                } else {
+                    LOGGER.log(Level.INFO, "Could not calculate final energy for building {0}, year{1}; using 0 instead!", new Object[]{building.getAlkisID(), simYear});
+                    output.setFinalEnergy(0d);
+                }
 
                 return output;
             }).collect(Collectors.toList());

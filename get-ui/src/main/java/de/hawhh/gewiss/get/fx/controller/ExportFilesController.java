@@ -122,12 +122,13 @@ public class ExportFilesController {
             topRow.createCell(3).setCellValue("Quarter");
             topRow.createCell(4).setCellValue("Heat Demand");
             topRow.createCell(5).setCellValue("Heat Demand m^2");
-            topRow.createCell(6).setCellValue("CO2 Emission");
-            topRow.createCell(7).setCellValue("Renovation Level");
-            topRow.createCell(8).setCellValue("Heating Type");
-            topRow.createCell(9).setCellValue("Renovation Cost");
-            topRow.createCell(10).setCellValue("Residential Floor Space");
-            topRow.createCell(11).setCellValue("Combined Floor Space");
+            topRow.createCell(6).setCellValue("Final Energy");
+            topRow.createCell(7).setCellValue("CO2 Emission");
+            topRow.createCell(8).setCellValue("Renovation Level");
+            topRow.createCell(9).setCellValue("Heating Type");
+            topRow.createCell(10).setCellValue("Renovation Cost");
+            topRow.createCell(11).setCellValue("Residential Floor Space");
+            topRow.createCell(12).setCellValue("Combined Floor Space");
 
             for (SimulationOutput so : result.getOutput().get(year)) {
                 Row row = sh.createRow(rowNum++);
@@ -137,12 +138,13 @@ public class ExportFilesController {
                 row.createCell(3).setCellValue(bi.get(so.getBuildingId()).getQuarter());
                 row.createCell(4).setCellValue(so.getHeatDemand());
                 row.createCell(5).setCellValue(so.getHeatDemandM2());
-                row.createCell(6).setCellValue(so.getCo2Emission());
-                row.createCell(7).setCellValue(so.getRenovationLevelString());
-                row.createCell(8).setCellValue(so.getHeatingTypeString());
-                row.createCell(9).setCellValue(so.getRenovationCost());
-                row.createCell(10).setCellValue(so.getResidentialArea());
-                row.createCell(11).setCellValue(so.getCombinedArea());
+                row.createCell(6).setCellValue(so.getFinalEnergy());
+                row.createCell(7).setCellValue(so.getCo2Emission());
+                row.createCell(8).setCellValue(so.getRenovationLevelString());
+                row.createCell(9).setCellValue(so.getHeatingTypeString());
+                row.createCell(10).setCellValue(so.getRenovationCost());
+                row.createCell(11).setCellValue(so.getResidentialArea());
+                row.createCell(12).setCellValue(so.getCombinedArea());
             }
         });
         LOGGER.info("Finished creating Excel workbook");
@@ -180,7 +182,7 @@ public class ExportFilesController {
             BufferedWriter csvWriter = new BufferedWriter(new FileWriter(file));
 
             CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.POSTGRESQL_CSV.withHeader(
-                    "Year", "Building ID", "Cluster ID", "Quarter", "Heat Demand", "Head Demand m^2", "CO2 emission",
+                    "Year", "Building ID", "Cluster ID", "Quarter", "Heat Demand", "Head Demand m^2", "Final Energy", "CO2 emission",
                     "Renovation Level", "Heating Type", "Renovation Cost", "Residential Floor Space",
                     "Combined Floor Space"));
 
@@ -197,6 +199,7 @@ public class ExportFilesController {
                             bi.get(so.getBuildingId()).getQuarter(),
                             so.getHeatDemand(),
                             so.getHeatDemandM2(),
+                            so.getFinalEnergy(),
                             so.getCo2Emission(),
                             so.getRenovationLevelString(),
                             so.getHeatingTypeString(),
