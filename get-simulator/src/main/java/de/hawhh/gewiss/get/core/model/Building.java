@@ -37,7 +37,7 @@ public class Building {
     private Double accumulatedRenovationCosts = 0d;
 
     public Building() {
-        this.renovationLevel = RenovationLevel.NO_RENOVATION;
+        this.renovationLevel = RenovationLevel.NO_RENOVATION; // @TODO: for removal, overridden in SQLiteBuildingDAO;
         //this.energyCalculator = new EnergyCalculator();
     }
 

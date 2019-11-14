@@ -5,6 +5,7 @@ import com.vividsolutions.jts.io.ParseException;
 import de.hawhh.gewiss.get.core.model.Building;
 import de.hawhh.gewiss.get.core.model.ConstructionAgeClass;
 import de.hawhh.gewiss.get.core.model.HeatingType;
+import de.hawhh.gewiss.get.core.model.RenovationLevel;
 import de.hawhh.gewiss.get.core.util.GeometryHelper;
 
 import java.sql.PreparedStatement;
@@ -43,7 +44,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
 
         // WG + NWG
         String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt,"
-                + "dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum"
+                + "dt_san_st, dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum"
                 + " FROM gewiss_buildings_v_1 WHERE nwg_typ NOT LIKE 'kein_Bedarf' AND NOT(iwu_typ LIKE '_' AND nwg_typ LIKE '_')";
 
         // just WG
@@ -68,6 +69,15 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 String statisticalArea = rs.getString("stat_gebiet");
                 String cityBlock = rs.getString("baublock");
                 Integer yearOfConstruction = rs.getInt("bj_alk_dt");
+                RenovationLevel renovationLevel;
+                int sanLevel = rs.getInt("dt_san_st");
+                if (sanLevel == 1) {
+                    renovationLevel = RenovationLevel.BASIC_RENOVATION;
+                } else if (sanLevel == 2) {
+                    renovationLevel = RenovationLevel.GOOD_RENOVATION;
+                } else {
+                    renovationLevel = RenovationLevel.NO_RENOVATION;
+                }
                 Integer yearOfRenovation = rs.getInt("dt_san_year");
                 String residentialType = rs.getString("iwu_typ");
                 String nonResidentialType = rs.getString("nwg_typ");
@@ -80,7 +90,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 HeatingType heatingType = HeatingType.valueOf(heatingTypeString);
 
                 Building building = createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district,
-                        quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
+                        quarter, statisticalArea, cityBlock, yearOfConstruction, renovationLevel, yearOfRenovation, residentialType,
                         nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance, accessDistrictHeating);
                 if (building != null) {
                     buildings.add(building);
@@ -108,7 +118,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
     @Override
     public Building findById(String buildingId) {
         String sql = "SELECT alkis_id, geomwkt, wohnfl, nwg_ngf, bezirk, stadtteil, stat_gebiet, baublock, bj_alk_dt,"
-                + "dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum"
+                + "dt_san_st, dt_san_year, dt_heiztyp, iwu_typ, nwg_typ, bak_fin, cluster, dt_fw_dist, dt_eigentum"
                 + " FROM gewiss_buildings_v_1 WHERE alkis_id = ?";
 
         try {
@@ -126,6 +136,15 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 String statisticalArea = rs.getString("stat_gebiet");
                 String cityBlock = rs.getString("baublock");
                 Integer yearOfConstruction = rs.getInt("bj_alk_dt");
+                RenovationLevel renovationLevel;
+                int sanLevel = rs.getInt("dt_san_st");
+                if (sanLevel == 1) {
+                    renovationLevel = RenovationLevel.BASIC_RENOVATION;
+                } else if (sanLevel == 2) {
+                    renovationLevel = RenovationLevel.GOOD_RENOVATION;
+                } else {
+                    renovationLevel = RenovationLevel.NO_RENOVATION;
+                }
                 Integer yearOfRenovation = rs.getInt("dt_san_year");
                 String residentialType = rs.getString("iwu_typ");
                 String nonResidentialType = rs.getString("nwg_typ");
@@ -138,7 +157,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
                 HeatingType heatingType = HeatingType.valueOf(heatingTypeString);
 
                 return createBuilding(alkisID, geomWkt, residentialFloorSpace, nonResidentialFloorSpace, district,
-                        quarter, statisticalArea, cityBlock, yearOfConstruction, yearOfRenovation, residentialType,
+                        quarter, statisticalArea, cityBlock, yearOfConstruction, renovationLevel, yearOfRenovation, residentialType,
                         nonResidentialType, ownership, constructionAgeClass, clusterID, heatingType, districtHeatingOutletDistance, accessDistrictHeating);
             }
         } catch (SQLException e) {
@@ -172,7 +191,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
      */
     private Building createBuilding(String alkisID, String geomWkt, Double residentialFloorSpace,
                                     Double nonResidentialFloorSpace, String district, String quarter, String statisticalArea, String cityBlock,
-                                    Integer yearOfConstruction, Integer yearOfRenovation, String residentialType, String nonResidentialType,
+                                    Integer yearOfConstruction, RenovationLevel renovationLevel, Integer yearOfRenovation, String residentialType, String nonResidentialType,
                                     String ownership, ConstructionAgeClass constructionAgeClass, String clusterID, HeatingType heatingType,
                                     Integer districtHeatingOutletDistance, Boolean accessDistrictHeating) {
 
@@ -193,6 +212,7 @@ public class SQLiteBuildingDAO extends SQLiteDAO implements BuildingDAO {
         building.setStatisticalArea(statisticalArea);
         building.setCityBlock(cityBlock);
         building.setYearOfConstruction(yearOfConstruction);
+        building.setRenovationLevel(renovationLevel);
         building.setYearOfRenovation(yearOfRenovation);
         building.setResidentialType(residentialType);
         building.setNonResidentialType(nonResidentialType);
